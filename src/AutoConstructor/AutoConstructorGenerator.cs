@@ -38,28 +38,24 @@ public class AutoConstructorGenerator : ISourceGenerator
         Dictionary<string, int> classNames = new();
         foreach (INamedTypeSymbol classSymbol in classSymbols)
         {
-            classNames.TryGetValue(classSymbol.Name, out int i);
-            string name = i == 0 ? classSymbol.Name : $"{classSymbol.Name}{i + 1}";
-            classNames[classSymbol.Name] = i + 1;
-            context.AddSource($"{name}.g.cs",
-                SourceText.From(CreatePrimaryConstructor(classSymbol), Encoding.UTF8));
+            string name;
+            if (classNames.TryGetValue(classSymbol.Name, out int i))
+            {
+                name = $"{classSymbol.Name}{i + 1}";
+                classNames[classSymbol.Name] = i + 1;
+            }
+            else
+            {
+                name = classSymbol.Name;
+                classNames[classSymbol.Name] = 1;
+            }
+
+            AutoConstructorBuilder autoConstructorBuilder = new(classSymbol);
+
+            context.AddSource(
+                $"{name}.g.cs",
+                SourceText.From(autoConstructorBuilder.CreateAutoConstructor(), Encoding.UTF8));
         }
-    }
-
-    private static string CreatePrimaryConstructor(INamedTypeSymbol classSymbol)
-    {
-        StringBuilder source = new(
-$@"namespace TestNamespace
-{{
-    partial class TestClass
-    {{
-        public TestClass()
-        {{
-        }}
-    }}
-}}");
-
-        return source.ToString();
     }
 
     private static IEnumerable<INamedTypeSymbol> GetClassSymbols(
