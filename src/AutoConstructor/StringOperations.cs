@@ -15,27 +15,21 @@
 namespace AutoConstructor;
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.CodeAnalysis;
+using System.Text.RegularExpressions;
 
-public class AutoConstructorBuilder
+public static class StringOperations
 {
-    private readonly TypeAnalyzer _typeAnalyzer = new();
-    private readonly SourceRenderer _sourceRenderer = new();
+    private static readonly Regex _removeBlankLines = new(@"(\s*\n)+", RegexOptions.Compiled);
 
-    private readonly INamedTypeSymbol _classSymbol;
-
-    public AutoConstructorBuilder(INamedTypeSymbol classSymbol)
+    public static string TrimMultiline(this string source, int indentation)
     {
-        _classSymbol = classSymbol;
+        Regex trimSpaces = new($@"^[ ]{{{indentation}}}(.+?)$", RegexOptions.Multiline);
+
+        return trimSpaces.Replace(source, "$1");
     }
 
-    public string CreateConstructor()
+    public static string RemoveBlankLines(this string source)
     {
-        IList<ConstructorParameter> members = _typeAnalyzer.GetMembers(_classSymbol);
-        return _sourceRenderer.Render(_classSymbol, members);
+        return _removeBlankLines.Replace(source, Environment.NewLine);
     }
-
-
 }

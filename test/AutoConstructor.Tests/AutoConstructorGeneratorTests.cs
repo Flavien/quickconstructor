@@ -29,7 +29,7 @@ public class AutoConstructorGeneratorTests
     public async Task EmptyClass()
     {
         string sourceCode = @"
-            [AutoConstructor.AutoConstructor]
+            [AutoConstructor]
             partial class TestClass
             {
             }";
@@ -45,12 +45,66 @@ public class AutoConstructorGeneratorTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
+    [Fact]
+    public async Task IncludedMembers()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                private readonly int field;
+                public int Property { get; }
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int field,
+                    int property)
+                {
+                    this.field = field;
+                    this.Property = property;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task ExcludedMembers()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                private static readonly int fieldOne;
+                private int fieldTwo;
+                private readonly int fieldThree = 10;
+                public static int PropertyOne { get; }
+                public int PropertyTwo { get; set; }
+                public int PropertyThree { get; private set; }
+                public int PropertyFour { get => 10; }
+                public int PropertyFive { get; } = 10;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass()
+                {
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
     private static async Task AssertGeneratedCode(string sourceCode, string generatedCode)
     {
-        Regex trimSpaces = new(@"^[ ]{8}(.+?)$", RegexOptions.Multiline);
+        string trimmedCode = StringOperations.TrimMultiline(generatedCode, 8);
 
         string eol = Environment.NewLine;
-        string fullGeneratedCode = $"namespace TestNamespace{eol}{{{trimSpaces.Replace(generatedCode, "$1")}{eol}}}";
+        string fullGeneratedCode = $"namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";
         
         CSharpSourceGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
@@ -58,7 +112,9 @@ public class AutoConstructorGeneratorTests
             {
                 Sources =
                 {
-                    $@"namespace TestNamespace
+                    $@"
+                    using AutoConstructor;
+                    namespace TestNamespace
                     {{
                         {sourceCode}
                     }}"

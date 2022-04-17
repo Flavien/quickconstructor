@@ -54,7 +54,7 @@ public class AutoConstructorGenerator : ISourceGenerator
 
             context.AddSource(
                 $"{name}.g.cs",
-                SourceText.From(autoConstructorBuilder.CreateAutoConstructor(), Encoding.UTF8));
+                SourceText.From(autoConstructorBuilder.CreateConstructor(), Encoding.UTF8));
         }
     }
 

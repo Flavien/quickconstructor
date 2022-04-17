@@ -14,28 +14,23 @@
 
 namespace AutoConstructor;
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.CodeAnalysis;
 
-public class AutoConstructorBuilder
+public class ConstructorParameter
 {
-    private readonly TypeAnalyzer _typeAnalyzer = new();
-    private readonly SourceRenderer _sourceRenderer = new();
-
-    private readonly INamedTypeSymbol _classSymbol;
-
-    public AutoConstructorBuilder(INamedTypeSymbol classSymbol)
+    public ConstructorParameter(
+        ISymbol symbol,
+        ITypeSymbol type,
+        string parameterName)
     {
-        _classSymbol = classSymbol;
+        Symbol = symbol;
+        Type = type;
+        ParameterName = parameterName;
     }
 
-    public string CreateConstructor()
-    {
-        IList<ConstructorParameter> members = _typeAnalyzer.GetMembers(_classSymbol);
-        return _sourceRenderer.Render(_classSymbol, members);
-    }
+    public ISymbol Symbol { get; }
 
+    public ITypeSymbol Type { get; }
 
+    public string ParameterName { get; }
 }
