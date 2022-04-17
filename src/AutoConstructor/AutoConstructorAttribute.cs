@@ -16,7 +16,8 @@ namespace AutoConstructor;
 
 using System;
 
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 public class AutoConstructorAttribute : Attribute
 {
+    public bool IncludeNonReadOnlyMembers { get; set; }
 }

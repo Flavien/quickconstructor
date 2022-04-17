@@ -23,17 +23,26 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public class TypeAnalyzer
 {
-    public IList<ConstructorParameter> GetMembers(INamedTypeSymbol classSymbol)
+    private readonly INamedTypeSymbol _classSymbol;
+    private readonly AutoConstructorAttribute _attribute;
+
+    public TypeAnalyzer(INamedTypeSymbol classSymbol, AutoConstructorAttribute attribute)
     {
-        IEnumerable<ConstructorParameter> fields = GetFields(classSymbol);
-        IEnumerable<ConstructorParameter> properties = GetProperties(classSymbol);
+        _classSymbol = classSymbol;
+        _attribute = attribute;
+    }
+
+    public IList<ConstructorParameter> GetMembers()
+    {
+        IEnumerable<ConstructorParameter> fields = GetFields();
+        IEnumerable<ConstructorParameter> properties = GetProperties();
 
         return fields.Concat(properties).ToList();
     }
 
-    private IEnumerable<ConstructorParameter> GetFields(INamedTypeSymbol classSymbol)
+    private IEnumerable<ConstructorParameter> GetFields()
     {
-        foreach (IFieldSymbol field in classSymbol.GetMembers().OfType<IFieldSymbol>())
+        foreach (IFieldSymbol field in _classSymbol.GetMembers().OfType<IFieldSymbol>())
         {
             if (!field.CanBeReferencedByName)
                 continue;
@@ -41,7 +50,7 @@ public class TypeAnalyzer
             if (field.IsStatic)
                 continue;
 
-            if (!field.IsReadOnly)
+            if (!_attribute.IncludeNonReadOnlyMembers && !field.IsReadOnly)
                 continue;
 
             if (HasFieldInitializer(field))
@@ -54,9 +63,9 @@ public class TypeAnalyzer
         }
     }
 
-    private IEnumerable<ConstructorParameter> GetProperties(INamedTypeSymbol classSymbol)
+    private IEnumerable<ConstructorParameter> GetProperties()
     {
-        foreach (IPropertySymbol property in classSymbol.GetMembers().OfType<IPropertySymbol>())
+        foreach (IPropertySymbol property in _classSymbol.GetMembers().OfType<IPropertySymbol>())
         {
             if (!property.CanBeReferencedByName)
                 continue;
@@ -64,7 +73,7 @@ public class TypeAnalyzer
             if (property.IsStatic)
                 continue;
 
-            if (!property.IsReadOnly)
+            if (!_attribute.IncludeNonReadOnlyMembers && !property.IsReadOnly)
                 continue;
 
             if (!IsAutoProperty(property))

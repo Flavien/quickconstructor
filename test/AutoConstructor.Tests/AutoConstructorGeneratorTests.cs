@@ -99,6 +99,35 @@ public class AutoConstructorGeneratorTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
+    [Fact]
+    public async Task IncludeNonReadOnlyMembers()
+    {
+        string sourceCode = @"
+            [AutoConstructor(IncludeNonReadOnlyMembers = true)]
+            partial class TestClass
+            {
+                private int fieldTwo;
+                public int PropertyTwo { get; set; }
+                public int PropertyThree { get; private set; }
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int fieldTwo,
+                    int propertyTwo,
+                    int propertyThree)
+                {
+                    this.fieldTwo = fieldTwo;
+                    this.PropertyTwo = propertyTwo;
+                    this.PropertyThree = propertyThree;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
     private static async Task AssertGeneratedCode(string sourceCode, string generatedCode)
     {
         string trimmedCode = StringOperations.TrimMultiline(generatedCode, 8);

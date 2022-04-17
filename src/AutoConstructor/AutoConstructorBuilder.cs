@@ -16,26 +16,42 @@ namespace AutoConstructor;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
 public class AutoConstructorBuilder
 {
-    private readonly TypeAnalyzer _typeAnalyzer = new();
     private readonly SourceRenderer _sourceRenderer = new();
 
     private readonly INamedTypeSymbol _classSymbol;
+    private readonly AutoConstructorAttribute _attribute;
 
     public AutoConstructorBuilder(INamedTypeSymbol classSymbol)
     {
         _classSymbol = classSymbol;
+        _attribute = CreateAttribute(classSymbol);
     }
 
     public string CreateConstructor()
     {
-        IList<ConstructorParameter> members = _typeAnalyzer.GetMembers(_classSymbol);
+        TypeAnalyzer typeAnalyzer = new(_classSymbol, _attribute);
+        IList<ConstructorParameter> members = typeAnalyzer.GetMembers();
         return _sourceRenderer.Render(_classSymbol, members);
     }
 
+    private static AutoConstructorAttribute CreateAttribute(INamedTypeSymbol classSymbol)
+    {
+        AttributeData attributeData = classSymbol
+            .GetAttributes()
+            .First(x => x.AttributeClass?.Name == nameof(AutoConstructorAttribute));
 
+        AutoConstructorAttribute attribute = Activator.CreateInstance<AutoConstructorAttribute>();
+        foreach (KeyValuePair<string, TypedConstant> pair in attributeData.NamedArguments)
+        {
+            typeof(AutoConstructorAttribute).GetProperty(pair.Key).SetValue(attribute, pair.Value.Value);
+        }
+
+        return attribute;
+    }
 }
