@@ -46,53 +46,34 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task IncludedMembers()
+    public async Task Default()
     {
         string sourceCode = @"
             [AutoConstructor]
             partial class TestClass
             {
-                private readonly int field;
-                public int Property { get; }
+                private readonly int fieldOne;
+                private static readonly int fieldTwo;
+                private int fieldThree;
+                private readonly int fieldFour = 10;
+
+                public int PropertyOne { get; }
+                public static int PropertyTwo { get; }
+                public int PropertyThree { get; set; }
+                public int PropertyFour { get; private set; }
+                public int PropertyFive { get => 10; }
+                public int PropertySix { get; } = 10;
             }";
 
         string generatedCode = @"
             partial class TestClass
             {
                 public TestClass(
-                    int field,
-                    int property)
+                    int fieldOne,
+                    int propertyOne)
                 {
-                    this.field = field;
-                    this.Property = property;
-                }
-            }";
-
-        await AssertGeneratedCode(sourceCode, generatedCode);
-    }
-
-    [Fact]
-    public async Task ExcludedMembers()
-    {
-        string sourceCode = @"
-            [AutoConstructor]
-            partial class TestClass
-            {
-                private static readonly int fieldOne;
-                private int fieldTwo;
-                private readonly int fieldThree = 10;
-                public static int PropertyOne { get; }
-                public int PropertyTwo { get; set; }
-                public int PropertyThree { get; private set; }
-                public int PropertyFour { get => 10; }
-                public int PropertyFive { get; } = 10;
-            }";
-
-        string generatedCode = @"
-            partial class TestClass
-            {
-                public TestClass()
-                {
+                    this.fieldOne = fieldOne;
+                    this.PropertyOne = propertyOne;
                 }
             }";
 
@@ -106,22 +87,34 @@ public class AutoConstructorGeneratorTests
             [AutoConstructor(IncludeNonReadOnlyMembers = true)]
             partial class TestClass
             {
-                private int fieldTwo;
-                public int PropertyTwo { get; set; }
-                public int PropertyThree { get; private set; }
+                private readonly int fieldOne;
+                private static readonly int fieldTwo;
+                private int fieldThree;
+                private readonly int fieldFour = 10;
+
+                public int PropertyOne { get; }
+                public static int PropertyTwo { get; }
+                public int PropertyThree { get; set; }
+                public int PropertyFour { get; private set; }
+                public int PropertyFive { get => 10; }
+                public int PropertySix { get; } = 10;
             }";
 
         string generatedCode = @"
             partial class TestClass
             {
                 public TestClass(
-                    int fieldTwo,
-                    int propertyTwo,
-                    int propertyThree)
+                    int fieldOne,
+                    int fieldThree,
+                    int propertyOne,
+                    int propertyThree,
+                    int propertyFour)
                 {
-                    this.fieldTwo = fieldTwo;
-                    this.PropertyTwo = propertyTwo;
+                    this.fieldOne = fieldOne;
+                    this.fieldThree = fieldThree;
+                    this.PropertyOne = propertyOne;
                     this.PropertyThree = propertyThree;
+                    this.PropertyFour = propertyFour;
                 }
             }";
 

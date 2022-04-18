@@ -27,11 +27,13 @@ public class AutoConstructorBuilder
     private readonly INamedTypeSymbol _classSymbol;
     private readonly AutoConstructorAttribute _attribute;
 
-    public AutoConstructorBuilder(INamedTypeSymbol classSymbol)
+    public AutoConstructorBuilder(INamedTypeSymbol classSymbol, AttributeData attributeData)
     {
         _classSymbol = classSymbol;
-        _attribute = CreateAttribute(classSymbol);
+        _attribute = CreateAttribute<AutoConstructorAttribute>(attributeData);
     }
+
+    public string Name { get => _classSymbol.Name; }
 
     public string CreateConstructor()
     {
@@ -40,16 +42,12 @@ public class AutoConstructorBuilder
         return _sourceRenderer.Render(_classSymbol, members);
     }
 
-    private static AutoConstructorAttribute CreateAttribute(INamedTypeSymbol classSymbol)
+    private static T CreateAttribute<T>(AttributeData attributeData)
     {
-        AttributeData attributeData = classSymbol
-            .GetAttributes()
-            .First(x => x.AttributeClass?.Name == nameof(AutoConstructorAttribute));
-
-        AutoConstructorAttribute attribute = Activator.CreateInstance<AutoConstructorAttribute>();
+        T attribute = Activator.CreateInstance<T>();
         foreach (KeyValuePair<string, TypedConstant> pair in attributeData.NamedArguments)
         {
-            typeof(AutoConstructorAttribute).GetProperty(pair.Key).SetValue(attribute, pair.Value.Value);
+            typeof(T).GetProperty(pair.Key).SetValue(attribute, pair.Value.Value);
         }
 
         return attribute;

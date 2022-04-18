@@ -14,11 +14,13 @@
 
 namespace AutoConstructor;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 [Generator]
@@ -34,31 +36,28 @@ public class AutoConstructorGenerator : ISourceGenerator
         if (context.SyntaxReceiver is not SyntaxReceiver receiver)
             return;
 
-        IEnumerable<INamedTypeSymbol> classSymbols = GetClassSymbols(context, receiver);
-        Dictionary<string, int> classNames = new();
-        foreach (INamedTypeSymbol classSymbol in classSymbols)
+        Dictionary<string, int> classNames = new(StringComparer.Ordinal);
+        foreach (AutoConstructorBuilder augmentedType in GetClassSymbols(context, receiver))
         {
             string name;
-            if (classNames.TryGetValue(classSymbol.Name, out int i))
+            if (classNames.TryGetValue(augmentedType.Name, out int i))
             {
-                name = $"{classSymbol.Name}{i + 1}";
-                classNames[classSymbol.Name] = i + 1;
+                name = $"{augmentedType.Name}{i + 1}";
+                classNames[augmentedType.Name] = i + 1;
             }
             else
             {
-                name = classSymbol.Name;
-                classNames[classSymbol.Name] = 1;
+                name = augmentedType.Name;
+                classNames[augmentedType.Name] = 1;
             }
-
-            AutoConstructorBuilder autoConstructorBuilder = new(classSymbol);
 
             context.AddSource(
                 $"{name}.g.cs",
-                SourceText.From(autoConstructorBuilder.CreateConstructor(), Encoding.UTF8));
+                SourceText.From(augmentedType.CreateConstructor(), Encoding.UTF8));
         }
     }
 
-    private static IEnumerable<INamedTypeSymbol> GetClassSymbols(
+    private static IEnumerable<AutoConstructorBuilder> GetClassSymbols(
         GeneratorExecutionContext context,
         SyntaxReceiver receiver)
     {
@@ -68,12 +67,27 @@ public class AutoConstructorGenerator : ISourceGenerator
                let model = compilation.GetSemanticModel(type.SyntaxTree)
                select model.GetDeclaredSymbol(type)
                into classSymbol
-               where HasAttribute(classSymbol, nameof(AutoConstructorAttribute))
-               select classSymbol;
+               let attribute = GetAttribute(classSymbol, nameof(AutoConstructorAttribute))
+               where attribute != null
+               select new AutoConstructorBuilder(classSymbol, attribute);
     }
 
-    private static bool HasAttribute(ISymbol symbol, string name)
+    private static AttributeData? GetAttribute(ISymbol symbol, string name)
     {
-        return symbol.GetAttributes().Any(x => x.AttributeClass?.Name == name);
+        return symbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Name == name);
+    }
+
+    private class SyntaxReceiver : ISyntaxReceiver
+    {
+        public IList<ClassDeclarationSyntax> CandidateClasses { get; } = new List<ClassDeclarationSyntax>();
+
+        public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+        {
+            if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
+                && classDeclarationSyntax.AttributeLists.Any(list => list.Attributes.Any()))
+            {
+                CandidateClasses.Add(classDeclarationSyntax);
+            }
+        }
     }
 }
