@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public class TypeAnalyzer
@@ -44,13 +45,15 @@ public class TypeAnalyzer
     {
         foreach (IFieldSymbol field in _classSymbol.GetMembers().OfType<IFieldSymbol>())
         {
+            AutoConstructorParameterAttribute? attribute = field.GetAttribute<AutoConstructorParameterAttribute>();
+
             if (!field.CanBeReferencedByName)
                 continue;
 
             if (field.IsStatic)
                 continue;
 
-            if (!_attribute.IncludeNonReadOnlyMembers && !field.IsReadOnly)
+            if (!_attribute.IncludeNonReadOnlyMembers && !field.IsReadOnly && attribute == null)
                 continue;
 
             if (HasFieldInitializer(field))
@@ -59,7 +62,9 @@ public class TypeAnalyzer
             yield return new ConstructorParameter(
                 symbol: field,
                 type: field.Type,
-                parameterName: ToCamelCase(field.Name));
+                parameterName: attribute?.Name == null
+                    ? GetParameterName(field.Name)
+                    : attribute.Name.TrimStart('@'));
         }
     }
 
@@ -67,13 +72,15 @@ public class TypeAnalyzer
     {
         foreach (IPropertySymbol property in _classSymbol.GetMembers().OfType<IPropertySymbol>())
         {
+            AutoConstructorParameterAttribute? attribute = property.GetAttribute<AutoConstructorParameterAttribute>();
+
             if (!property.CanBeReferencedByName)
                 continue;
 
             if (property.IsStatic)
                 continue;
 
-            if (!_attribute.IncludeNonReadOnlyMembers && !property.IsReadOnly)
+            if (!_attribute.IncludeNonReadOnlyMembers && !property.IsReadOnly && attribute == null)
                 continue;
 
             if (!IsAutoProperty(property))
@@ -85,14 +92,16 @@ public class TypeAnalyzer
             yield return new ConstructorParameter(
                 symbol: property,
                 type: property.Type,
-                parameterName: ToCamelCase(property.Name));
+                parameterName: attribute?.Name == null
+                    ? GetParameterName(property.Name)
+                    : attribute.Name.TrimStart('@'));
         }
     }
 
-    private static string ToCamelCase(string name)
+    private static string GetParameterName(string symbolName)
     {
-        name = name.TrimStart('_');
-        return name.Substring(0, 1).ToLowerInvariant() + name.Substring(1);
+        symbolName = @symbolName.TrimStart('_', '@');
+        return symbolName.Substring(0, 1).ToLowerInvariant() + symbolName.Substring(1);
     }
 
     private static bool HasFieldInitializer(IFieldSymbol symbol)

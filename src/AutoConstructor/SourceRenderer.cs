@@ -52,7 +52,7 @@ public class SourceRenderer
         stringBuilder.AppendLine();
         stringBuilder.Append(' ', 24);
         stringBuilder.Append(parameter.Type.ToDisplayString(RenderFormats.MemberTypeFormat));
-        stringBuilder.Append(' ');
+        stringBuilder.Append(" @");
         stringBuilder.Append(parameter.ParameterName);
 
         return stringBuilder.ToString();
@@ -64,9 +64,9 @@ public class SourceRenderer
 
         stringBuilder.AppendLine();
         stringBuilder.Append(' ', 24);
-        stringBuilder.Append("this.");
+        stringBuilder.Append("this.@");
         stringBuilder.Append(parameter.Symbol.Name);
-        stringBuilder.Append(" = ");
+        stringBuilder.Append(" = @");
         stringBuilder.Append(parameter.ParameterName);
         stringBuilder.Append(';');
 

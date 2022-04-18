@@ -67,14 +67,9 @@ public class AutoConstructorGenerator : ISourceGenerator
                let model = compilation.GetSemanticModel(type.SyntaxTree)
                select model.GetDeclaredSymbol(type)
                into classSymbol
-               let attribute = GetAttribute(classSymbol, nameof(AutoConstructorAttribute))
+               let attribute = classSymbol.GetAttribute<AutoConstructorAttribute>()
                where attribute != null
                select new AutoConstructorBuilder(classSymbol, attribute);
-    }
-
-    private static AttributeData? GetAttribute(ISymbol symbol, string name)
-    {
-        return symbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Name == name);
     }
 
     private class SyntaxReceiver : ISyntaxReceiver

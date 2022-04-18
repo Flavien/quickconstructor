@@ -26,7 +26,7 @@ using Xunit;
 public class AutoConstructorGeneratorTests
 {
     [Fact]
-    public async Task EmptyClass()
+    public async Task MemberSelection_EmptyClass()
     {
         string sourceCode = @"
             [AutoConstructor]
@@ -46,7 +46,7 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task Default()
+    public async Task MemberSelection_Default()
     {
         string sourceCode = @"
             [AutoConstructor]
@@ -69,11 +69,11 @@ public class AutoConstructorGeneratorTests
             partial class TestClass
             {
                 public TestClass(
-                    int fieldOne,
-                    int propertyOne)
+                    int @fieldOne,
+                    int @propertyOne)
                 {
-                    this.fieldOne = fieldOne;
-                    this.PropertyOne = propertyOne;
+                    this.@fieldOne = @fieldOne;
+                    this.@PropertyOne = @propertyOne;
                 }
             }";
 
@@ -81,7 +81,7 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task IncludeNonReadOnlyMembers()
+    public async Task MemberSelection_IncludeNonReadOnlyMembers()
     {
         string sourceCode = @"
             [AutoConstructor(IncludeNonReadOnlyMembers = true)]
@@ -104,17 +104,126 @@ public class AutoConstructorGeneratorTests
             partial class TestClass
             {
                 public TestClass(
-                    int fieldOne,
-                    int fieldThree,
-                    int propertyOne,
-                    int propertyThree,
-                    int propertyFour)
+                    int @fieldOne,
+                    int @fieldThree,
+                    int @propertyOne,
+                    int @propertyThree,
+                    int @propertyFour)
                 {
-                    this.fieldOne = fieldOne;
-                    this.fieldThree = fieldThree;
-                    this.PropertyOne = propertyOne;
-                    this.PropertyThree = propertyThree;
-                    this.PropertyFour = propertyFour;
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldThree = @fieldThree;
+                    this.@PropertyOne = @propertyOne;
+                    this.@PropertyThree = @propertyThree;
+                    this.@PropertyFour = @propertyFour;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task MemberSelection_AutoConstructorParameterAttribute()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                [AutoConstructorParameter]
+                private readonly int fieldOne;
+                [AutoConstructorParameter]
+                private static readonly int fieldTwo;
+                [AutoConstructorParameter]
+                private int fieldThree;
+                [AutoConstructorParameter]
+                private readonly int fieldFour = 10;
+
+                [AutoConstructorParameter]
+                public int PropertyOne { get; }
+                [AutoConstructorParameter]
+                public static int PropertyTwo { get; }
+                [AutoConstructorParameter]
+                public int PropertyThree { get; set; }
+                [AutoConstructorParameter]
+                public int PropertyFour { get; private set; }
+                [AutoConstructorParameter]
+                public int PropertyFive { get => 10; }
+                [AutoConstructorParameter]
+                public int PropertySix { get; } = 10;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne,
+                    int @fieldThree,
+                    int @propertyOne,
+                    int @propertyThree,
+                    int @propertyFour)
+                {
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldThree = @fieldThree;
+                    this.@PropertyOne = @propertyOne;
+                    this.@PropertyThree = @propertyThree;
+                    this.@PropertyFour = @propertyFour;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task ParameterName_AutoConstructorParameter()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                [AutoConstructorParameter(Name = ""modifiedField"")]
+                private readonly int fieldOne;
+
+                [AutoConstructorParameter(Name = ""@modifiedProperty"")]
+                public int PropertyOne { get; }
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @modifiedField,
+                    int @modifiedProperty)
+                {
+                    this.@fieldOne = @modifiedField;
+                    this.@PropertyOne = @modifiedProperty;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task ParameterName_ReservedKeyword()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                private readonly int @class;
+                private readonly int @return;
+                private readonly int _underscoreField;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @class,
+                    int @return,
+                    int @underscoreField)
+                {
+                    this.@class = @class;
+                    this.@return = @return;
+                    this.@_underscoreField = @underscoreField;
                 }
             }";
 

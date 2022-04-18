@@ -20,25 +20,28 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
-public class AutoConstructorBuilder
+internal static class AutoConstructorExtensions
 {
-    private readonly SourceRenderer _sourceRenderer = new();
-
-    private readonly INamedTypeSymbol _classSymbol;
-    private readonly AutoConstructorAttribute _attribute;
-
-    public AutoConstructorBuilder(INamedTypeSymbol classSymbol, AutoConstructorAttribute attribute)
+    public static T? GetAttribute<T>(this ISymbol symbol)
+        where T : Attribute
     {
-        _classSymbol = classSymbol;
-        _attribute = attribute;
+        string name = typeof(T).Name;
+        AttributeData? attribute = symbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.Name == name);
+
+        if (attribute == null)
+            return null;
+
+        return CreateAttribute<T>(attribute);
     }
 
-    public string Name { get => _classSymbol.Name; }
-
-    public string CreateConstructor()
+    public static T CreateAttribute<T>(this AttributeData attributeData)
     {
-        TypeAnalyzer typeAnalyzer = new(_classSymbol, _attribute);
-        IList<ConstructorParameter> members = typeAnalyzer.GetMembers();
-        return _sourceRenderer.Render(_classSymbol, members);
+        T attribute = Activator.CreateInstance<T>();
+        foreach (KeyValuePair<string, TypedConstant> pair in attributeData.NamedArguments)
+        {
+            typeof(T).GetProperty(pair.Key).SetValue(attribute, pair.Value.Value);
+        }
+
+        return attribute;
     }
 }
