@@ -24,7 +24,7 @@ public class SourceRenderer
     public string Render(INamedTypeSymbol classSymbol, IList<ConstructorParameter> parameters)
     {
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
-        string classDeclaration = classSymbol.ToDisplayString(RenderFormats.ClassDeclarationFormat);
+        string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", parameters.Select(parameter => RenderParameter(parameter)));
         string assignments = string.Concat(parameters.Select(parameter => RenderAssignment(parameter)));
         StringBuilder source = new($@"
@@ -51,7 +51,7 @@ public class SourceRenderer
 
         stringBuilder.AppendLine();
         stringBuilder.Append(' ', 24);
-        stringBuilder.Append(parameter.Type.ToDisplayString(RenderFormats.MemberTypeFormat));
+        stringBuilder.Append(parameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
         stringBuilder.Append(" @");
         stringBuilder.Append(parameter.ParameterName);
 

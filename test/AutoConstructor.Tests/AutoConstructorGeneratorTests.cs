@@ -202,15 +202,15 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task ParameterName_ReservedKeyword()
+    public async Task ParameterName_Default()
     {
         string sourceCode = @"
             [AutoConstructor]
             partial class TestClass
             {
                 private readonly int @class;
-                private readonly int @return;
                 private readonly int _underscoreField;
+                public int Return { get; }
             }";
 
         string generatedCode = @"
@@ -218,12 +218,50 @@ public class AutoConstructorGeneratorTests
             {
                 public TestClass(
                     int @class,
-                    int @return,
-                    int @underscoreField)
+                    int @underscoreField,
+                    int @return)
                 {
                     this.@class = @class;
-                    this.@return = @return;
                     this.@_underscoreField = @underscoreField;
+                    this.@Return = @return;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+    
+    [Fact]
+    public async Task ArgumentTypes()
+    {
+        string sourceCode = @"
+            using System.Collections.Generic;
+            using L = System.Collections.Generic.LinkedList<System.ApplicationException>;
+
+            [AutoConstructor]
+            partial class TestClass<T> where T : class
+            {
+                private readonly T fieldOne;
+                private readonly System.IO.Stream fieldTwo;
+                private readonly System.Collections.Generic.List<System.IO.Stream> fieldThree;
+                private readonly List<System.IO.Stream> fieldFour;
+                private readonly L fieldFive;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass<T>
+            {
+                public TestClass(
+                    T @fieldOne,
+                    global::System.IO.Stream @fieldTwo,
+                    global::System.Collections.Generic.List<global::System.IO.Stream> @fieldThree,
+                    global::System.Collections.Generic.List<global::System.IO.Stream> @fieldFour,
+                    global::System.Collections.Generic.LinkedList<global::System.ApplicationException> @fieldFive)
+                {
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldTwo = @fieldTwo;
+                    this.@fieldThree = @fieldThree;
+                    this.@fieldFour = @fieldFour;
+                    this.@fieldFive = @fieldFive;
                 }
             }";
 
