@@ -309,6 +309,35 @@ public class AutoConstructorGeneratorTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
+    [Fact]
+    public async Task NestedClass()
+    {
+        string sourceCode = @"
+            partial class Parent
+            {
+                [AutoConstructor]
+                partial class TestClass
+                {
+                    private readonly int fieldOne;
+                }
+            }";
+
+        string generatedCode = @"
+            partial class Parent
+            {
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
     private static async Task AssertGeneratedCode(string sourceCode, string generatedCode)
     {
         string trimmedCode = StringOperations.TrimMultiline(generatedCode, 8);

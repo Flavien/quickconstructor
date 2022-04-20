@@ -27,19 +27,31 @@ public class SourceRenderer
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", parameters.Select(parameter => RenderParameter(parameter)));
         string assignments = string.Concat(parameters.Select(parameter => RenderAssignment(parameter)));
-        StringBuilder source = new($@"
-            namespace {namespaceName}
-            {{
+        string namespaceContents = $@"
                 partial class {classDeclaration}
                 {{
                     public {classSymbol.Name}({parameterDeclarations})
                     {{
                         {assignments}
                     }}
-                }}
-            }}");
+                }}";
 
-        return source.ToString()
+        INamedTypeSymbol currentSymbol = classSymbol;
+        while (currentSymbol.ContainingType != null)
+        {
+            currentSymbol = currentSymbol.ContainingType;
+            namespaceContents = $@"
+                partial class {currentSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}
+                {{{namespaceContents}
+                }}";
+        }
+
+        string source = $@"
+            namespace {namespaceName}
+            {{{namespaceContents}
+            }}";
+
+        return source
             .TrimMultiline(12)
             .RemoveBlankLines()
             .TrimStart('\r', '\n');
