@@ -14,6 +14,7 @@
 
 namespace AutoConstructor;
 
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
 public class ConstructorParameter
@@ -21,11 +22,13 @@ public class ConstructorParameter
     public ConstructorParameter(
         ISymbol symbol,
         ITypeSymbol type,
-        string parameterName)
+        string parameterName,
+        IReadOnlyList<AttributeData> attributes)
     {
         Symbol = symbol;
         Type = type;
         ParameterName = parameterName;
+        Attributes = attributes;
     }
 
     public ISymbol Symbol { get; }
@@ -33,4 +36,6 @@ public class ConstructorParameter
     public ITypeSymbol Type { get; }
 
     public string ParameterName { get; }
+
+    public IReadOnlyList<AttributeData> Attributes { get; }
 }

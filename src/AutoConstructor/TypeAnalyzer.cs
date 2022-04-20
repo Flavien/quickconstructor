@@ -47,10 +47,7 @@ public class TypeAnalyzer
         {
             AutoConstructorParameterAttribute? attribute = field.GetAttribute<AutoConstructorParameterAttribute>();
 
-            if (!field.CanBeReferencedByName)
-                continue;
-
-            if (field.IsStatic)
+            if (ExcludeMember(field))
                 continue;
 
             if (!_attribute.IncludeNonReadOnlyMembers && !field.IsReadOnly && attribute == null)
@@ -59,12 +56,7 @@ public class TypeAnalyzer
             if (HasFieldInitializer(field))
                 continue;
 
-            yield return new ConstructorParameter(
-                symbol: field,
-                type: field.Type,
-                parameterName: attribute?.Name == null
-                    ? GetParameterName(field.Name)
-                    : attribute.Name.TrimStart('@'));
+            yield return CreateParameter(field, field.Type, attribute);
         }
     }
 
@@ -74,10 +66,7 @@ public class TypeAnalyzer
         {
             AutoConstructorParameterAttribute? attribute = property.GetAttribute<AutoConstructorParameterAttribute>();
 
-            if (!property.CanBeReferencedByName)
-                continue;
-
-            if (property.IsStatic)
+            if (ExcludeMember(property))
                 continue;
 
             if (!_attribute.IncludeNonReadOnlyMembers && !property.IsReadOnly && attribute == null)
@@ -89,19 +78,14 @@ public class TypeAnalyzer
             if (HasPropertyInitializer(property))
                 continue;
 
-            yield return new ConstructorParameter(
-                symbol: property,
-                type: property.Type,
-                parameterName: attribute?.Name == null
-                    ? GetParameterName(property.Name)
-                    : attribute.Name.TrimStart('@'));
+            yield return CreateParameter(property, property.Type, attribute);
         }
     }
 
-    private static string GetParameterName(string symbolName)
+    public static bool ExcludeMember(ISymbol member)
     {
-        symbolName = @symbolName.TrimStart('_', '@');
-        return symbolName.Substring(0, 1).ToLowerInvariant() + symbolName.Substring(1);
+        return !member.CanBeReferencedByName
+            || member.IsStatic;
     }
 
     private static bool HasFieldInitializer(IFieldSymbol symbol)
@@ -126,5 +110,56 @@ public class TypeAnalyzer
         PropertyDeclarationSyntax? property = syntaxNode as PropertyDeclarationSyntax;
 
         return property?.Initializer != null;
+    }
+
+    private static ConstructorParameter CreateParameter(
+        ISymbol member,
+        ITypeSymbol type,
+        AutoConstructorParameterAttribute? parameterAttribute)
+    {
+        string parameterName;
+        if (parameterAttribute?.Name == null)
+            parameterName = GetParameterName(member.Name);
+        else
+            parameterName = parameterAttribute.Name.TrimStart('@');
+
+        List<AttributeData> attributeData = new();
+        if (parameterAttribute?.IncludeAttributes != false)
+        {
+            foreach (AttributeData attribute in member.GetAttributes())
+            {
+                if (attribute.AttributeClass == null)
+                    continue;
+
+                AttributeData? attributeUsage = attribute.AttributeClass
+                    .GetAttributes()
+                    .FirstOrDefault(x => x.AttributeClass?.Name == nameof(AttributeUsageAttribute));
+
+                if (attributeUsage == null)
+                    continue;
+
+                TypedConstant validOn = attributeUsage.ConstructorArguments[0];
+                if (!(validOn.Value is int targets))
+                    continue;
+
+                if (((AttributeTargets)targets).HasFlag(AttributeTargets.Parameter))
+                {
+                    attributeData.Add(attribute);
+                }
+            }
+        }
+
+
+        return new ConstructorParameter(
+                symbol: member,
+                type: type,
+                parameterName: parameterName,
+                attributes: attributeData);
+    }
+
+    private static string GetParameterName(string symbolName)
+    {
+        symbolName = @symbolName.TrimStart('_', '@');
+        return symbolName.Substring(0, 1).ToLowerInvariant() + symbolName.Substring(1);
     }
 }

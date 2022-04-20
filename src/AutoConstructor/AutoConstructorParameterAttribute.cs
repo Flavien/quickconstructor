@@ -20,4 +20,6 @@ using System;
 public class AutoConstructorParameterAttribute : Attribute
 {
     public string? Name { get; set; } = null;
+
+    public bool IncludeAttributes { get; set; } = true;
 }

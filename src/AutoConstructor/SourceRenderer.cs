@@ -51,6 +51,10 @@ public class SourceRenderer
 
         stringBuilder.AppendLine();
         stringBuilder.Append(' ', 24);
+
+        foreach (AttributeData attribute in parameter.Attributes)
+            stringBuilder.Append($"[{attribute}] ");
+
         stringBuilder.Append(parameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
         stringBuilder.Append(" @");
         stringBuilder.Append(parameter.ParameterName);

@@ -229,7 +229,7 @@ public class AutoConstructorGeneratorTests
 
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
-    
+
     [Fact]
     public async Task ArgumentTypes()
     {
@@ -268,13 +268,54 @@ public class AutoConstructorGeneratorTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
+    [Fact]
+    public async Task Attributes()
+    {
+        string sourceCode = @"
+            using System.ComponentModel.DataAnnotations;
+
+            [AutoConstructor]
+            partial class TestClass
+            {
+                [Display(AutoGenerateField = true, Description = ""Applicable"")]
+                [DisplayFormat(DataFormatString = ""Not applicable"")]
+                private readonly int fieldOne;
+
+                [AutoConstructorParameter]
+                [Display(AutoGenerateField = true, Description = ""Applicable"")]
+                [DisplayFormat(DataFormatString = ""Not applicable"")]
+                private readonly int fieldTwo;
+
+                [AutoConstructorParameter(IncludeAttributes = false)]
+                [Display(AutoGenerateField = true, Description = ""Applicable"")]
+                [DisplayFormat(DataFormatString = ""Not applicable"")]
+                private readonly int fieldThree;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    [System.ComponentModel.DataAnnotations.DisplayAttribute(AutoGenerateField = true, Description = ""Applicable"")] int @fieldOne,
+                    [System.ComponentModel.DataAnnotations.DisplayAttribute(AutoGenerateField = true, Description = ""Applicable"")] int @fieldTwo,
+                    int @fieldThree)
+                {
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldTwo = @fieldTwo;
+                    this.@fieldThree = @fieldThree;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
     private static async Task AssertGeneratedCode(string sourceCode, string generatedCode)
     {
         string trimmedCode = StringOperations.TrimMultiline(generatedCode, 8);
 
         string eol = Environment.NewLine;
         string fullGeneratedCode = $"namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";
-        
+
         CSharpSourceGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
             TestState =
