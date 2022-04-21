@@ -20,6 +20,7 @@ using System.Text.RegularExpressions;
 public static class StringOperations
 {
     private static readonly Regex _removeBlankLines = new(@"(\s*\n)+", RegexOptions.Compiled);
+    private static readonly Regex _indent = new("(\n|\r\n)", RegexOptions.Compiled);
 
     public static string TrimMultiline(this string source, int indentation)
     {
@@ -31,5 +32,10 @@ public static class StringOperations
     public static string RemoveBlankLines(this string source)
     {
         return _removeBlankLines.Replace(source, Environment.NewLine);
+    }
+
+    public static string Indent(this string source, int spaces)
+    {
+        return _indent.Replace(source, "$1" + new string(' ', spaces));
     }
 }

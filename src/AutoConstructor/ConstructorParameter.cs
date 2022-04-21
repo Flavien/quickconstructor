@@ -37,7 +37,7 @@ public class ConstructorParameter
 
     public ITypeSymbol Type { get; }
 
-    public string ParameterName { get; }
+    public string? ParameterName { get; }
 
     public bool NullCheck { get; }
 

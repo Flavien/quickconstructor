@@ -237,7 +237,7 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task ArgumentTypes()
+    public async Task Rendering_ArgumentTypes()
     {
         string sourceCode = @"
             using System.Collections.Generic;
@@ -275,7 +275,7 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task Attributes()
+    public async Task Rendering_Attributes()
     {
         string sourceCode = @"
             using System.ComponentModel.DataAnnotations;
@@ -316,7 +316,7 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task NestedClass()
+    public async Task Rendering_NestedClass()
     {
         string sourceCode = @"
             partial class Parent
@@ -331,14 +331,14 @@ public class AutoConstructorGeneratorTests
         string generatedCode = @"
             partial class Parent
             {
-            partial class TestClass
-            {
-                public TestClass(
-                    int @fieldOne)
+                partial class TestClass
                 {
-                    this.@fieldOne = @fieldOne;
+                    public TestClass(
+                        int @fieldOne)
+                    {
+                        this.@fieldOne = @fieldOne;
+                    }
                 }
-            }
             }";
 
         await AssertGeneratedCode(sourceCode, generatedCode);
@@ -429,6 +429,42 @@ public class AutoConstructorGeneratorTests
     {
         string sourceCode = @"
             [AutoConstructor(NullChecks = NullChecksSettings.Never)]
+            partial class TestClass
+            {
+                private readonly int fieldOne;
+                private readonly int? fieldTwo;
+                private readonly string fieldThree;
+                private readonly string? fieldFour;
+                private readonly System.Collections.Generic.List<string?> fieldFive;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne,
+                    int? @fieldTwo,
+                    string @fieldThree,
+                    string? @fieldFour,
+                    global::System.Collections.Generic.List<string?> @fieldFive)
+                {
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldTwo = @fieldTwo;
+                    this.@fieldThree = @fieldThree;
+                    this.@fieldFour = @fieldFour;
+                    this.@fieldFive = @fieldFive;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task NullChecks_NullableReferenceTypesDisabled()
+    {
+        string sourceCode = @"
+            #nullable disable
+            [AutoConstructor(NullChecks = NullChecksSettings.NonNullableReferencesOnly)]
             partial class TestClass
             {
                 private readonly int fieldOne;

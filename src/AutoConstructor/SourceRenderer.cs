@@ -50,7 +50,7 @@ public class SourceRenderer
             currentSymbol = currentSymbol.ContainingType;
             namespaceContents = $@"
                 partial class {currentSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}
-                {{{namespaceContents}
+                {{{namespaceContents.Indent(4)}
                 }}";
         }
 

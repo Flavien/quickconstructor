@@ -139,7 +139,7 @@ public class TypeAnalyzer
                     continue;
 
                 TypedConstant validOn = attributeUsage.ConstructorArguments[0];
-                if (!(validOn.Value is int targets))
+                if (validOn.Value is not int targets)
                     continue;
 
                 if (((AttributeTargets)targets).HasFlag(AttributeTargets.Parameter))
