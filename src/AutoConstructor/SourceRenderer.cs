@@ -14,6 +14,7 @@
 
 namespace AutoConstructor;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,17 +22,25 @@ using Microsoft.CodeAnalysis;
 
 public class SourceRenderer
 {
+    private static readonly SymbolDisplayFormat _parameterFormat = SymbolDisplayFormat.FullyQualifiedFormat
+        .WithMiscellaneousOptions(
+            SymbolDisplayFormat.FullyQualifiedFormat.MiscellaneousOptions
+            | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+
     public string Render(INamedTypeSymbol classSymbol, IList<ConstructorParameter> parameters)
     {
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", parameters.Select(parameter => RenderParameter(parameter)));
+        string nullChecks = string.Concat(parameters.Select(parameter => RenderNullCheck(parameter)));
         string assignments = string.Concat(parameters.Select(parameter => RenderAssignment(parameter)));
         string namespaceContents = $@"
                 partial class {classDeclaration}
                 {{
                     public {classSymbol.Name}({parameterDeclarations})
                     {{
+                        {nullChecks}
+
                         {assignments}
                     }}
                 }}";
@@ -67,9 +76,25 @@ public class SourceRenderer
         foreach (AttributeData attribute in parameter.Attributes)
             stringBuilder.Append($"[{attribute}] ");
 
-        stringBuilder.Append(parameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+        stringBuilder.Append(parameter.Type.ToDisplayString(_parameterFormat));
         stringBuilder.Append(" @");
         stringBuilder.Append(parameter.ParameterName);
+
+        return stringBuilder.ToString();
+    }
+
+    private string RenderNullCheck(ConstructorParameter parameter)
+    {
+        if (!parameter.NullCheck)
+            return string.Empty;
+
+        StringBuilder stringBuilder = new();
+
+        stringBuilder.AppendLine();
+        stringBuilder.Append(' ', 24);
+        stringBuilder.AppendLine($"if (@{ parameter.ParameterName} == null)");
+        stringBuilder.Append(' ', 24);
+        stringBuilder.AppendLine($"    throw new System.ArgumentNullException(nameof(@{ parameter.ParameterName }));");
 
         return stringBuilder.ToString();
     }

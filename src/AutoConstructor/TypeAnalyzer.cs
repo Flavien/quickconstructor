@@ -112,7 +112,7 @@ public class TypeAnalyzer
         return property?.Initializer != null;
     }
 
-    private static ConstructorParameter CreateParameter(
+    private ConstructorParameter CreateParameter(
         ISymbol member,
         ITypeSymbol type,
         AutoConstructorParameterAttribute? parameterAttribute)
@@ -148,12 +148,16 @@ public class TypeAnalyzer
                 }
             }
         }
-
+        
+        bool nullCheck = _attribute.NullChecks
+            && !type.IsValueType
+            && type.NullableAnnotation != NullableAnnotation.Annotated;
 
         return new ConstructorParameter(
                 symbol: member,
                 type: type,
                 parameterName: parameterName,
+                nullCheck: nullCheck,
                 attributes: attributeData);
     }
 

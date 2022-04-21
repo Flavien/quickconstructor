@@ -20,4 +20,6 @@ using System;
 public class AutoConstructorAttribute : Attribute
 {
     public bool IncludeNonReadOnlyMembers { get; set; }
+
+    public bool NullChecks { get; set; } = true;
 }

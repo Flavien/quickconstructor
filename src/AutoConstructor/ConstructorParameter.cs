@@ -23,11 +23,13 @@ public class ConstructorParameter
         ISymbol symbol,
         ITypeSymbol type,
         string parameterName,
+        bool nullCheck,
         IReadOnlyList<AttributeData> attributes)
     {
         Symbol = symbol;
         Type = type;
         ParameterName = parameterName;
+        NullCheck = nullCheck;
         Attributes = attributes;
     }
 
@@ -36,6 +38,8 @@ public class ConstructorParameter
     public ITypeSymbol Type { get; }
 
     public string ParameterName { get; }
+
+    public bool NullCheck { get; }
 
     public IReadOnlyList<AttributeData> Attributes { get; }
 }

@@ -208,19 +208,25 @@ public class AutoConstructorGeneratorTests
             [AutoConstructor]
             partial class TestClass
             {
-                private readonly int @class;
-                private readonly int _underscoreField;
-                public int Return { get; }
+                private readonly string @class;
+                private readonly string _underscoreField;
+                public string Return { get; }
             }";
 
         string generatedCode = @"
             partial class TestClass
             {
                 public TestClass(
-                    int @class,
-                    int @underscoreField,
-                    int @return)
+                    string @class,
+                    string @underscoreField,
+                    string @return)
                 {
+                    if (@class == null)
+                        throw new System.ArgumentNullException(nameof(@class));
+                    if (@underscoreField == null)
+                        throw new System.ArgumentNullException(nameof(@underscoreField));
+                    if (@return == null)
+                        throw new System.ArgumentNullException(nameof(@return));
                     this.@class = @class;
                     this.@_underscoreField = @underscoreField;
                     this.@Return = @return;
@@ -257,6 +263,16 @@ public class AutoConstructorGeneratorTests
                     global::System.Collections.Generic.List<global::System.IO.Stream> @fieldFour,
                     global::System.Collections.Generic.LinkedList<global::System.ApplicationException> @fieldFive)
                 {
+                    if (@fieldOne == null)
+                        throw new System.ArgumentNullException(nameof(@fieldOne));
+                    if (@fieldTwo == null)
+                        throw new System.ArgumentNullException(nameof(@fieldTwo));
+                    if (@fieldThree == null)
+                        throw new System.ArgumentNullException(nameof(@fieldThree));
+                    if (@fieldFour == null)
+                        throw new System.ArgumentNullException(nameof(@fieldFour));
+                    if (@fieldFive == null)
+                        throw new System.ArgumentNullException(nameof(@fieldFive));
                     this.@fieldOne = @fieldOne;
                     this.@fieldTwo = @fieldTwo;
                     this.@fieldThree = @fieldThree;
@@ -333,6 +349,99 @@ public class AutoConstructorGeneratorTests
                     this.@fieldOne = @fieldOne;
                 }
             }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task NullableTypes_Annotations()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                private readonly int fieldOne;
+                private readonly int? fieldTwo;
+                private readonly string fieldThree;
+                private readonly string? fieldFour;
+                private readonly System.Collections.Generic.List<string?> fieldFive;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne,
+                    int? @fieldTwo,
+                    string @fieldThree,
+                    string? @fieldFour,
+                    global::System.Collections.Generic.List<string?> @fieldFive)
+                {
+                    if (@fieldThree == null)
+                        throw new System.ArgumentNullException(nameof(@fieldThree));
+                    if (@fieldFive == null)
+                        throw new System.ArgumentNullException(nameof(@fieldFive));
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldTwo = @fieldTwo;
+                    this.@fieldThree = @fieldThree;
+                    this.@fieldFour = @fieldFour;
+                    this.@fieldFive = @fieldFive;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Theory]
+    [InlineData("class")]
+    [InlineData("System.Uri")]
+    [InlineData("notnull")]
+    public async Task NullableTypes_NullableGenerics(string constraint)
+    {
+        string sourceCode = $@"
+            [AutoConstructor]
+            partial class TestClass<T> where T : {constraint}
+            {{
+                private readonly T? fieldOne;
+            }}";
+
+        string generatedCode = @"
+            partial class TestClass<T>
+            {
+                public TestClass(
+                    T? @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Theory]
+    [InlineData("class")]
+    [InlineData("System.Uri")]
+    [InlineData("notnull")]
+    public async Task NullableTypes_NonNullableGenerics(string constraint)
+    {
+        string sourceCode = $@"
+            [AutoConstructor]
+            partial class TestClass<T> where T : {constraint}
+            {{
+                private readonly T fieldOne;
+            }}";
+
+        string generatedCode = @"
+            partial class TestClass<T>
+            {
+                public TestClass(
+                    T @fieldOne)
+                {
+                    if (@fieldOne == null)
+                        throw new System.ArgumentNullException(nameof(@fieldOne));
+                    this.@fieldOne = @fieldOne;
+                }
             }";
 
         await AssertGeneratedCode(sourceCode, generatedCode);
