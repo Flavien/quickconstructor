@@ -17,29 +17,25 @@ namespace AutoConstructor;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-public class ConstructorParameter
+public class TypeAnalysisResult
 {
-    public ConstructorParameter(
-        ISymbol symbol,
-        ITypeSymbol type,
-        string parameterName,
-        bool nullCheck,
-        IReadOnlyList<AttributeData> attributes)
+    public TypeAnalysisResult(
+        INamedTypeSymbol classSymbol,
+        IReadOnlyList<ConstructorParameter>? constructorParameters,
+        IReadOnlyList<Diagnostic> diagnostics)
     {
-        Symbol = symbol;
-        Type = type;
-        ParameterName = parameterName;
-        NullCheck = nullCheck;
-        Attributes = attributes;
+        ClassSymbol = classSymbol;
+        ConstructorParameters = constructorParameters;
+        Diagnostics = diagnostics;
     }
 
-    public ISymbol Symbol { get; }
+    public TypeAnalysisResult(INamedTypeSymbol classSymbol, params Diagnostic[] diagnostics)
+        : this(classSymbol, null, diagnostics)
+    { }
 
-    public ITypeSymbol Type { get; }
+    public INamedTypeSymbol ClassSymbol { get; }
 
-    public string ParameterName { get; }
+    public IReadOnlyList<ConstructorParameter>? ConstructorParameters { get; }
 
-    public bool NullCheck { get; }
-
-    public IReadOnlyList<AttributeData> Attributes { get; }
+    public IReadOnlyList<Diagnostic> Diagnostics { get; }
 }

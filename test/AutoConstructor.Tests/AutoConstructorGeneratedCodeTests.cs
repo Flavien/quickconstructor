@@ -23,7 +23,7 @@ using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
 
-public class AutoConstructorGeneratorTests
+public class AutoConstructorGeneratedCodeTests
 {
     [Fact]
     public async Task MemberSelection_EmptyClass()
@@ -527,7 +527,7 @@ public class AutoConstructorGeneratorTests
 
     private static async Task AssertGeneratedCode(string sourceCode, string generatedCode)
     {
-        string trimmedCode = StringOperations.TrimMultiline(generatedCode, 8);
+        string trimmedCode = generatedCode.TrimMultiline(8);
 
         string eol = Environment.NewLine;
         string fullGeneratedCode = $"#nullable enable{eol}namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";

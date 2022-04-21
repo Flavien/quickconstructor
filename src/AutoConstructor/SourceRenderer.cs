@@ -26,7 +26,7 @@ public class SourceRenderer
             SymbolDisplayFormat.FullyQualifiedFormat.MiscellaneousOptions
             | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
 
-    public string Render(INamedTypeSymbol classSymbol, IList<ConstructorParameter> parameters)
+    public string Render(INamedTypeSymbol classSymbol, IReadOnlyList<ConstructorParameter> parameters)
     {
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);

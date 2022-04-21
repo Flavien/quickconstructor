@@ -17,7 +17,7 @@ namespace AutoConstructor;
 using System;
 using System.Text.RegularExpressions;
 
-public static class StringOperations
+public static class StringExtensions
 {
     private static readonly Regex _removeBlankLines = new(@"(\s*\n)+", RegexOptions.Compiled);
     private static readonly Regex _indent = new("(\n|\r\n)", RegexOptions.Compiled);

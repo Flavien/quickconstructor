@@ -17,7 +17,6 @@ namespace AutoConstructor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,20 +24,51 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 public class TypeAnalyzer
 {
     private readonly INamedTypeSymbol _classSymbol;
+    private readonly ClassDeclarationSyntax _declarationSyntax;
     private readonly AutoConstructorAttribute _attribute;
 
-    public TypeAnalyzer(INamedTypeSymbol classSymbol, AutoConstructorAttribute attribute)
+    public TypeAnalyzer(INamedTypeSymbol classSymbol, ClassDeclarationSyntax declarationSyntax, AutoConstructorAttribute attribute)
     {
         _classSymbol = classSymbol;
+        _declarationSyntax = declarationSyntax;
         _attribute = attribute;
     }
 
-    public IList<ConstructorParameter> GetMembers()
+    public TypeAnalysisResult AnalyzeType()
     {
-        IEnumerable<ConstructorParameter> fields = GetFields();
-        IEnumerable<ConstructorParameter> properties = GetProperties();
+        if (!_declarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PartialKeyword)))
+        {
+            return new TypeAnalysisResult(
+                _classSymbol,
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ClassMustBePartial,
+                    _declarationSyntax.GetLocation(),
+                    _classSymbol.Name));
+        }
 
-        return fields.Concat(properties).ToList();
+        IReadOnlyList<ConstructorParameter> members = GetFields().Concat(GetProperties()).ToList().AsReadOnly();
+
+        ILookup<string, ConstructorParameter> lookup = members
+            .ToLookup(member => member.ParameterName, StringComparer.Ordinal);
+
+        IList<ConstructorParameter> duplicates = lookup
+            .Where(nameGroup => nameGroup.Count() > 1)
+            .Select(nameGroup => nameGroup.Last())
+            .ToList();
+
+        if (duplicates.Count > 0)
+        {
+            return new TypeAnalysisResult(
+                _classSymbol,
+                Diagnostic.Create(
+                    DiagnosticDescriptors.DuplicateConstructorParameter,
+                    _declarationSyntax.GetLocation()));
+        }
+
+        return new TypeAnalysisResult(
+            classSymbol: _classSymbol,
+            constructorParameters: members,
+            diagnostics: Array.Empty<Diagnostic>());
     }
 
     private IEnumerable<ConstructorParameter> GetFields()
