@@ -14,12 +14,9 @@
 
 namespace AutoConstructor;
 
-using System;
-
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public class AutoConstructorAttribute : Attribute
+public enum NullChecksSettings
 {
-    public bool IncludeNonReadOnlyMembers { get; set; }
-
-    public NullChecksSettings NullChecks { get; set; } = NullChecksSettings.NonNullableReferencesOnly;
+    Always,
+    Never,
+    NonNullableReferencesOnly
 }

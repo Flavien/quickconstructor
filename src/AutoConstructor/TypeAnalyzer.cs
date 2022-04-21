@@ -148,10 +148,14 @@ public class TypeAnalyzer
                 }
             }
         }
-        
-        bool nullCheck = _attribute.NullChecks
-            && !type.IsValueType
-            && type.NullableAnnotation != NullableAnnotation.Annotated;
+
+        bool nullCheck;
+        if (_attribute.NullChecks == NullChecksSettings.NonNullableReferencesOnly)
+            nullCheck = !type.IsValueType && type.NullableAnnotation == NullableAnnotation.NotAnnotated;
+        else if (_attribute.NullChecks == NullChecksSettings.Always)
+            nullCheck = !type.IsValueType;
+        else
+            nullCheck = false;
 
         return new ConstructorParameter(
                 symbol: member,

@@ -14,7 +14,6 @@
 
 namespace AutoConstructor;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -56,6 +55,7 @@ public class SourceRenderer
         }
 
         string source = $@"
+            #nullable enable
             namespace {namespaceName}
             {{{namespaceContents}
             }}";

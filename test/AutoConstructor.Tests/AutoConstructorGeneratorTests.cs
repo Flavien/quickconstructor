@@ -243,7 +243,7 @@ public class AutoConstructorGeneratorTests
             using System.Collections.Generic;
             using L = System.Collections.Generic.LinkedList<System.ApplicationException>;
 
-            [AutoConstructor]
+            [AutoConstructor(NullChecks = NullChecksSettings.Never)]
             partial class TestClass<T> where T : class
             {
                 private readonly T fieldOne;
@@ -263,16 +263,6 @@ public class AutoConstructorGeneratorTests
                     global::System.Collections.Generic.List<global::System.IO.Stream> @fieldFour,
                     global::System.Collections.Generic.LinkedList<global::System.ApplicationException> @fieldFive)
                 {
-                    if (@fieldOne == null)
-                        throw new System.ArgumentNullException(nameof(@fieldOne));
-                    if (@fieldTwo == null)
-                        throw new System.ArgumentNullException(nameof(@fieldTwo));
-                    if (@fieldThree == null)
-                        throw new System.ArgumentNullException(nameof(@fieldThree));
-                    if (@fieldFour == null)
-                        throw new System.ArgumentNullException(nameof(@fieldFour));
-                    if (@fieldFive == null)
-                        throw new System.ArgumentNullException(nameof(@fieldFive));
                     this.@fieldOne = @fieldOne;
                     this.@fieldTwo = @fieldTwo;
                     this.@fieldThree = @fieldThree;
@@ -355,10 +345,10 @@ public class AutoConstructorGeneratorTests
     }
 
     [Fact]
-    public async Task NullableTypes_Annotations()
+    public async Task NullChecks_NonNullableReferencesOnly()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(NullChecks = NullChecksSettings.NonNullableReferencesOnly)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -393,26 +383,76 @@ public class AutoConstructorGeneratorTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
-    [Theory]
-    [InlineData("class")]
-    [InlineData("System.Uri")]
-    [InlineData("notnull")]
-    public async Task NullableTypes_NullableGenerics(string constraint)
+    [Fact]
+    public async Task NullChecks_Always()
     {
-        string sourceCode = $@"
-            [AutoConstructor]
-            partial class TestClass<T> where T : {constraint}
-            {{
-                private readonly T? fieldOne;
-            }}";
+        string sourceCode = @"
+            [AutoConstructor(NullChecks = NullChecksSettings.Always)]
+            partial class TestClass
+            {
+                private readonly int fieldOne;
+                private readonly int? fieldTwo;
+                private readonly string fieldThree;
+                private readonly string? fieldFour;
+                private readonly System.Collections.Generic.List<string?> fieldFive;
+            }";
 
         string generatedCode = @"
-            partial class TestClass<T>
+            partial class TestClass
             {
                 public TestClass(
-                    T? @fieldOne)
+                    int @fieldOne,
+                    int? @fieldTwo,
+                    string @fieldThree,
+                    string? @fieldFour,
+                    global::System.Collections.Generic.List<string?> @fieldFive)
+                {
+                    if (@fieldThree == null)
+                        throw new System.ArgumentNullException(nameof(@fieldThree));
+                    if (@fieldFour == null)
+                        throw new System.ArgumentNullException(nameof(@fieldFour));
+                    if (@fieldFive == null)
+                        throw new System.ArgumentNullException(nameof(@fieldFive));
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldTwo = @fieldTwo;
+                    this.@fieldThree = @fieldThree;
+                    this.@fieldFour = @fieldFour;
+                    this.@fieldFive = @fieldFive;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task NullChecks_Never()
+    {
+        string sourceCode = @"
+            [AutoConstructor(NullChecks = NullChecksSettings.Never)]
+            partial class TestClass
+            {
+                private readonly int fieldOne;
+                private readonly int? fieldTwo;
+                private readonly string fieldThree;
+                private readonly string? fieldFour;
+                private readonly System.Collections.Generic.List<string?> fieldFive;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne,
+                    int? @fieldTwo,
+                    string @fieldThree,
+                    string? @fieldFour,
+                    global::System.Collections.Generic.List<string?> @fieldFive)
                 {
                     this.@fieldOne = @fieldOne;
+                    this.@fieldTwo = @fieldTwo;
+                    this.@fieldThree = @fieldThree;
+                    this.@fieldFour = @fieldFour;
+                    this.@fieldFive = @fieldFive;
                 }
             }";
 
@@ -422,11 +462,13 @@ public class AutoConstructorGeneratorTests
     [Theory]
     [InlineData("class")]
     [InlineData("System.Uri")]
+    [InlineData("class?")]
+    [InlineData("System.Uri?")]
     [InlineData("notnull")]
-    public async Task NullableTypes_NonNullableGenerics(string constraint)
+    public async Task NullChecks_Generics(string constraint)
     {
         string sourceCode = $@"
-            [AutoConstructor]
+            [AutoConstructor(NullChecks = NullChecksSettings.NonNullableReferencesOnly)]
             partial class TestClass<T> where T : {constraint}
             {{
                 private readonly T fieldOne;
@@ -452,7 +494,7 @@ public class AutoConstructorGeneratorTests
         string trimmedCode = StringOperations.TrimMultiline(generatedCode, 8);
 
         string eol = Environment.NewLine;
-        string fullGeneratedCode = $"namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";
+        string fullGeneratedCode = $"#nullable enable{eol}namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";
 
         CSharpSourceGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
@@ -461,6 +503,7 @@ public class AutoConstructorGeneratorTests
                 Sources =
                 {
                     $@"
+                    #nullable enable
                     using AutoConstructor;
                     namespace TestNamespace
                     {{
