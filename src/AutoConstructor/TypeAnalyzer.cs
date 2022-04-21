@@ -62,7 +62,9 @@ public class TypeAnalyzer
                 _classSymbol,
                 Diagnostic.Create(
                     DiagnosticDescriptors.DuplicateConstructorParameter,
-                    _declarationSyntax.GetLocation()));
+                    _declarationSyntax.GetLocation(),
+                    duplicates[0].ParameterName,
+                    _classSymbol.Name));
         }
 
         return new TypeAnalysisResult(

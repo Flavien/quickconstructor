@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,6 +27,8 @@ using Microsoft.CodeAnalysis.Text;
 [Generator]
 public class AutoConstructorGenerator : ISourceGenerator
 {
+    private static readonly Regex _attributeSyntaxRegex = new("AutoConstructor(Attribute)?$", RegexOptions.Compiled);
+
     private readonly SourceRenderer _sourceRenderer = new();
 
     public void Initialize(GeneratorInitializationContext context)
@@ -77,8 +80,7 @@ public class AutoConstructorGenerator : ISourceGenerator
         Compilation compilation = context.Compilation;
 
         return from type in receiver.CandidateClasses
-               let model = compilation.GetSemanticModel(type.SyntaxTree)
-               let classSymbol = model.GetDeclaredSymbol(type)
+               let classSymbol = compilation.GetSemanticModel(type.SyntaxTree).GetDeclaredSymbol(type)
                let attribute = classSymbol.GetAttribute<AutoConstructorAttribute>()
                where attribute != null
                select new TypeAnalyzer(classSymbol, type, attribute);
@@ -90,11 +92,16 @@ public class AutoConstructorGenerator : ISourceGenerator
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
-                && classDeclarationSyntax.AttributeLists.Any(list => list.Attributes.Any()))
-            {
-                CandidateClasses.Add(classDeclarationSyntax);
-            }
+            if (syntaxNode is not AttributeSyntax attribute)
+                return;
+
+            if (attribute?.Parent?.Parent is not ClassDeclarationSyntax classDeclarationSyntax)
+                return;
+
+            if (!_attributeSyntaxRegex.IsMatch(attribute.Name.ToString()))
+                return;
+
+            CandidateClasses.Add(classDeclarationSyntax);
         }
     }
 }

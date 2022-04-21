@@ -345,6 +345,67 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
+    public async Task SyntaxTree_Partial()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                private readonly int fieldOne;
+            }
+
+            partial class TestClass
+            {
+                private readonly int fieldTwo;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne,
+                    int @fieldTwo)
+                {
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldTwo = @fieldTwo;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Theory]
+    [InlineData("AutoConstructor")]
+    [InlineData("AutoConstructor()")]
+    [InlineData("AutoConstructorAttribute")]
+    [InlineData("AutoConstructor.AutoConstructor")]
+    [InlineData("AutoConstructor.AutoConstructorAttribute")]
+    [InlineData("global::AutoConstructor.AutoConstructor")]
+    [InlineData("global::AutoConstructor.AutoConstructorAttribute")]
+    [InlineData("global::AutoConstructor.AutoConstructorAttribute()")]
+    public async Task SyntaxTree_AttributeSyntax(string attributeSyntax)
+    {
+        string sourceCode = $@"
+            [{attributeSyntax}]
+            partial class TestClass
+            {{
+                private readonly int fieldOne;
+            }}";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
     public async Task NullChecks_NonNullableReferencesOnly()
     {
         string sourceCode = @"

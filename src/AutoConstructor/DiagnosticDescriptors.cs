@@ -19,7 +19,7 @@ using Microsoft.CodeAnalysis;
 public class DiagnosticDescriptors
 {
     public static DiagnosticDescriptor ClassMustBePartial { get; } = new(
-        id: "AUTOCONST0001",
+        id: "AC0001",
         title: "Classes decorated with the [AutoConstructor] attribute must be marked partial",
         messageFormat: "Declare '{0}' as partial or remove the [AutoConstructor] attribute.",
         category: "AutoConstructor",
@@ -27,7 +27,7 @@ public class DiagnosticDescriptors
         isEnabledByDefault: true);
 
     public static DiagnosticDescriptor DuplicateConstructorParameter { get; } = new(
-        id: "AUTOCONST0001",
+        id: "AC0002",
         title: "Duplicate parameter name for auto-generated constructor",
         messageFormat: "The parameter '{0}' is duplicated in the auto-generated constructor for '{1}'.",
         category: "AutoConstructor",
