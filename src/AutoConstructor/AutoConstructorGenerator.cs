@@ -44,15 +44,15 @@ public class AutoConstructorGenerator : ISourceGenerator
         Dictionary<string, int> classNames = new(StringComparer.Ordinal);
         foreach (TypeAnalyzer typeAnalyzer in GetClassSymbols(context, receiver))
         {
-            TypeAnalysisResult result = typeAnalyzer.AnalyzeType();
+            IncompleteTypeAnalysisResult result = typeAnalyzer.AnalyzeType();
 
             foreach (Diagnostic diagnostic in result.Diagnostics)
                 context.ReportDiagnostic(diagnostic);
 
-            if (result.ConstructorParameters == null)
+            if (result is not TypeAnalysisResult successfulResult)
                 continue;
 
-            string symbolName = result.ClassSymbol.Name;
+            string symbolName = typeAnalyzer.ClassSymbol.Name;
             string name;
             if (classNames.TryGetValue(symbolName, out int i))
             {
@@ -68,7 +68,10 @@ public class AutoConstructorGenerator : ISourceGenerator
             context.AddSource(
                 $"{name}.g.cs",
                 SourceText.From(
-                    _sourceRenderer.Render(result.ClassSymbol, result.ConstructorParameters),
+                    _sourceRenderer.Render(
+                        typeAnalyzer.ClassSymbol,
+                        successfulResult.ConstructorParameters,
+                        successfulResult.BaseClassConstructorParameters),
                     Encoding.UTF8));
         }
     }

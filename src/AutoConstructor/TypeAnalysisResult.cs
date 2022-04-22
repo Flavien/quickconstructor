@@ -14,28 +14,28 @@
 
 namespace AutoConstructor;
 
+using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-public class TypeAnalysisResult
+public record TypeAnalysisResult : IncompleteTypeAnalysisResult
 {
+    public static TypeAnalysisResult Empty { get; } = new TypeAnalysisResult(
+        Array.Empty<ConstructorParameter>(),
+        Array.Empty<ConstructorParameter>(),
+        Array.Empty<Diagnostic>());
+
     public TypeAnalysisResult(
-        INamedTypeSymbol classSymbol,
-        IReadOnlyList<ConstructorParameter>? constructorParameters,
+        IReadOnlyList<ConstructorParameter> constructorParameters,
+        IReadOnlyList<ConstructorParameter> baseClassConstructorParameters,
         IReadOnlyList<Diagnostic> diagnostics)
+        : base(diagnostics)
     {
-        ClassSymbol = classSymbol;
         ConstructorParameters = constructorParameters;
-        Diagnostics = diagnostics;
+        BaseClassConstructorParameters = baseClassConstructorParameters;
     }
 
-    public TypeAnalysisResult(INamedTypeSymbol classSymbol, params Diagnostic[] diagnostics)
-        : this(classSymbol, null, diagnostics)
-    { }
+    public IReadOnlyList<ConstructorParameter> ConstructorParameters { get; }
 
-    public INamedTypeSymbol ClassSymbol { get; }
-
-    public IReadOnlyList<ConstructorParameter>? ConstructorParameters { get; }
-
-    public IReadOnlyList<Diagnostic> Diagnostics { get; }
+    public IReadOnlyList<ConstructorParameter> BaseClassConstructorParameters { get; }
 }

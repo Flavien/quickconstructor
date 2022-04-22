@@ -34,17 +34,27 @@ public class TypeAnalyzer
         _attribute = attribute;
     }
 
-    public TypeAnalysisResult AnalyzeType()
+    public INamedTypeSymbol ClassSymbol { get => _classSymbol; }
+
+    public IncompleteTypeAnalysisResult AnalyzeType()
     {
         if (!_declarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PartialKeyword)))
         {
-            return new TypeAnalysisResult(
-                _classSymbol,
-                Diagnostic.Create(
-                    DiagnosticDescriptors.ClassMustBePartial,
-                    _declarationSyntax.GetLocation(),
-                    _classSymbol.Name));
+            return IncompleteTypeAnalysisResult.From(Diagnostic.Create(
+                DiagnosticDescriptors.ClassMustBePartial,
+                _declarationSyntax.GetLocation(),
+                _classSymbol.Name));
         }
+
+        IncompleteTypeAnalysisResult baseClassAnalysis = GetBaseClassMembers();
+
+        if (baseClassAnalysis is not TypeAnalysisResult successfulParentAnalysis)
+            return baseClassAnalysis;
+
+        IReadOnlyList<ConstructorParameter> baseClassMembers = successfulParentAnalysis.BaseClassConstructorParameters
+            .Concat(successfulParentAnalysis.ConstructorParameters)
+            .ToList()
+            .AsReadOnly();
 
         IReadOnlyList<ConstructorParameter> members = GetFields().Concat(GetProperties()).ToList().AsReadOnly();
 
@@ -58,18 +68,16 @@ public class TypeAnalyzer
 
         if (duplicates.Count > 0)
         {
-            return new TypeAnalysisResult(
-                _classSymbol,
-                Diagnostic.Create(
-                    DiagnosticDescriptors.DuplicateConstructorParameter,
-                    _declarationSyntax.GetLocation(),
-                    duplicates[0].ParameterName,
-                    _classSymbol.Name));
+            return IncompleteTypeAnalysisResult.From(Diagnostic.Create(
+                DiagnosticDescriptors.DuplicateConstructorParameter,
+                _declarationSyntax.GetLocation(),
+                duplicates[0].ParameterName,
+                _classSymbol.Name));
         }
 
         return new TypeAnalysisResult(
-            classSymbol: _classSymbol,
             constructorParameters: members,
+            baseClassConstructorParameters: baseClassMembers,
             diagnostics: Array.Empty<Diagnostic>());
     }
 
@@ -201,5 +209,42 @@ public class TypeAnalyzer
     {
         symbolName = @symbolName.TrimStart('_', '@');
         return symbolName.Substring(0, 1).ToLowerInvariant() + symbolName.Substring(1);
+    }
+
+    private IncompleteTypeAnalysisResult GetBaseClassMembers()
+    {
+        if (_classSymbol.BaseType != null)
+        {
+            AutoConstructorAttribute? parentAttribute = _classSymbol.BaseType.GetAttribute<AutoConstructorAttribute>();
+            if (parentAttribute != null)
+            {
+                TypeAnalyzer parentAnalyzer = new(_classSymbol.BaseType, _declarationSyntax, parentAttribute);
+                IncompleteTypeAnalysisResult parentResult = parentAnalyzer.AnalyzeType();
+
+                if (parentResult is not TypeAnalysisResult successfulResult)
+                    return IncompleteTypeAnalysisResult.From();
+                else
+                    return successfulResult;
+            }
+            else
+            {
+                if (_classSymbol.BaseType.InstanceConstructors.Any(constructor =>
+                    constructor.Parameters.Length == 0 && constructor.DeclaredAccessibility != Accessibility.Private))
+                {
+                    return TypeAnalysisResult.Empty;
+                }
+                else
+                {
+                    return IncompleteTypeAnalysisResult.From(Diagnostic.Create(
+                        DiagnosticDescriptors.BaseClassMustHaveAttribute,
+                        _declarationSyntax.GetLocation(),
+                        _classSymbol.Name));
+                }
+            }
+        }
+        else
+        {
+            return TypeAnalysisResult.Empty;
+        }
     }
 }

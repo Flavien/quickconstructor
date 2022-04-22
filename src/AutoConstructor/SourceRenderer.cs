@@ -26,17 +26,23 @@ public class SourceRenderer
             SymbolDisplayFormat.FullyQualifiedFormat.MiscellaneousOptions
             | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
 
-    public string Render(INamedTypeSymbol classSymbol, IReadOnlyList<ConstructorParameter> parameters)
+    public string Render(
+        INamedTypeSymbol classSymbol,
+        IReadOnlyList<ConstructorParameter> parameters,
+        IReadOnlyList<ConstructorParameter> baseClassParameters)
     {
+        IEnumerable<ConstructorParameter> allParameters = baseClassParameters.Concat(parameters);
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-        string parameterDeclarations = string.Join(",", parameters.Select(parameter => RenderParameter(parameter)));
+        string parameterDeclarations = string.Join(",", allParameters.Select(parameter => RenderParameter(parameter)));
+        string baseClassConstructor = CreateBaseClassConstructor(baseClassParameters);
         string nullChecks = string.Concat(parameters.Select(parameter => RenderNullCheck(parameter)));
         string assignments = string.Concat(parameters.Select(parameter => RenderAssignment(parameter)));
         string namespaceContents = $@"
                 partial class {classDeclaration}
                 {{
                     public {classSymbol.Name}({parameterDeclarations})
+                        {baseClassConstructor}
                     {{
                         {nullChecks}
 
@@ -112,5 +118,15 @@ public class SourceRenderer
         stringBuilder.Append(';');
 
         return stringBuilder.ToString();
+    }
+
+    private string CreateBaseClassConstructor(IReadOnlyList<ConstructorParameter> baseClassParameters)
+    {
+        if (baseClassParameters.Count == 0)
+            return string.Empty;
+
+        IEnumerable<string> argumentList = baseClassParameters.Select(argument => "@" + argument.ParameterName);
+
+        return $": base({string.Join(", ", argumentList)})";
     }
 }
