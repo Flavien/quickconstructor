@@ -17,7 +17,7 @@ namespace AutoConstructor;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-public class ConstructorParameter
+public record ConstructorParameter
 {
     public ConstructorParameter(
         ISymbol symbol,

@@ -14,21 +14,16 @@
 
 namespace AutoConstructor;
 
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using Microsoft.CodeAnalysis;
 
-public record IncompleteTypeAnalysis
+public class AutoConstructorException : Exception
 {
-    public IncompleteTypeAnalysis(IReadOnlyList<Diagnostic> diagnostics)
+    public AutoConstructorException(Diagnostic diagnostic)
+        : base(diagnostic.Descriptor.Title.ToString())
     {
-        Diagnostics = diagnostics;
+        Diagnostic = diagnostic;
     }
 
-    public IReadOnlyList<Diagnostic> Diagnostics { get; }
-
-    public static IncompleteTypeAnalysis From(params Diagnostic[] diagnostics)
-    {
-        return new IncompleteTypeAnalysis(diagnostics.ToList().AsReadOnly());
-    }
+    public Diagnostic Diagnostic { get; }
 }

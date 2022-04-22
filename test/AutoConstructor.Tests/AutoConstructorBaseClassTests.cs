@@ -16,7 +16,6 @@ namespace AutoConstructor.Tests;
 
 using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
@@ -53,11 +52,6 @@ public class AutoConstructorBaseClassTests
                 }
             }";
 
-        await AssertGeneratedCode(sourceCode, generatedCode);
-    }
-
-    private static async Task AssertGeneratedCode(string sourceCode, string generatedCode)
-    {
         string parentClassGeneratedCode = @"
             partial class Parent
             {
@@ -68,6 +62,98 @@ public class AutoConstructorBaseClassTests
                 }
             }";
 
+        await AssertGeneratedCode(sourceCode, ("TestClass", generatedCode), ("Parent", parentClassGeneratedCode));
+    }
+
+    [Fact]
+    public async Task BaseClass_ParentWithDefaultConstructor()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass : System.Exception
+            {
+                private readonly int fieldOne;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, ("TestClass", generatedCode));
+    }
+
+    [Fact]
+    public async Task BaseClass_Grandparent()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class Grandparent
+            {
+                private readonly int grandparentClassField;
+            }
+
+            [AutoConstructor]
+            partial class TestClass : Parent
+            {
+                private readonly int fieldOne;
+            }
+
+            [AutoConstructor]
+            partial class Parent : Grandparent
+            {
+                private readonly int parentClassField;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @grandparentClassField,
+                    int @parentClassField,
+                    int @fieldOne)
+                    : base(@grandparentClassField, @parentClassField)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        string parentClassGeneratedCode = @"
+            partial class Parent
+            {
+                public Parent(
+                    int @grandparentClassField,
+                    int @parentClassField)
+                    : base(@grandparentClassField)
+                {
+                    this.@parentClassField = @parentClassField;
+                }
+            }";
+
+        string grandparentClassGeneratedCode = @"
+            partial class Grandparent
+            {
+                public Grandparent(
+                    int @grandparentClassField)
+                {
+                    this.@grandparentClassField = @grandparentClassField;
+                }
+            }";
+
+        await AssertGeneratedCode(
+            sourceCode,
+            ("Grandparent", grandparentClassGeneratedCode),
+            ("TestClass", generatedCode),
+            ("Parent", parentClassGeneratedCode));
+    }
+
+    private static async Task AssertGeneratedCode(string sourceCode, params (string name, string code)[] expected)
+    {
         CSharpSourceGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
             TestState =
@@ -81,24 +167,19 @@ public class AutoConstructorBaseClassTests
                     {{
                         {sourceCode}
                     }}"
-                },
-                GeneratedSources =
-                {
-                    (
-                        typeof(AutoConstructorGenerator),
-                        $"TestClass.g.cs",
-                        SourceText.From(CreateExpectedFile(generatedCode), Encoding.UTF8)
-                    ),
-                    (
-                        typeof(AutoConstructorGenerator),
-                        $"Parent.g.cs",
-                        SourceText.From(CreateExpectedFile(parentClassGeneratedCode), Encoding.UTF8)
-                    ),
                 }
             },
         };
 
         tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorGenerator).Assembly);
+
+        foreach ((string name, string code) in expected)
+        {
+            tester.TestState.GeneratedSources.Add((
+                typeof(AutoConstructorGenerator),
+                $"{name}.g.cs",
+                SourceText.From(CreateExpectedFile(code), Encoding.UTF8)));
+        }
 
         await tester.RunAsync();
     }

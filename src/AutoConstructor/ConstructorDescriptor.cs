@@ -14,22 +14,13 @@
 
 namespace AutoConstructor;
 
-using System;
 using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
 
-public record SuccessfulTypeAnalysis : IncompleteTypeAnalysis
+public record ConstructorDescriptor
 {
-    public static SuccessfulTypeAnalysis Empty { get; } = new SuccessfulTypeAnalysis(
-        Array.Empty<ConstructorParameter>(),
-        Array.Empty<ConstructorParameter>(),
-        Array.Empty<Diagnostic>());
-
-    public SuccessfulTypeAnalysis(
+    public ConstructorDescriptor(
         IReadOnlyList<ConstructorParameter> constructorParameters,
-        IReadOnlyList<ConstructorParameter> baseClassConstructorParameters,
-        IReadOnlyList<Diagnostic> diagnostics)
-        : base(diagnostics)
+        IReadOnlyList<ConstructorParameter> baseClassConstructorParameters)
     {
         ConstructorParameters = constructorParameters;
         BaseClassConstructorParameters = baseClassConstructorParameters;
