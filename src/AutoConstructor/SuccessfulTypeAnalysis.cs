@@ -18,14 +18,14 @@ using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-public record TypeAnalysisResult : IncompleteTypeAnalysisResult
+public record SuccessfulTypeAnalysis : IncompleteTypeAnalysis
 {
-    public static TypeAnalysisResult Empty { get; } = new TypeAnalysisResult(
+    public static SuccessfulTypeAnalysis Empty { get; } = new SuccessfulTypeAnalysis(
         Array.Empty<ConstructorParameter>(),
         Array.Empty<ConstructorParameter>(),
         Array.Empty<Diagnostic>());
 
-    public TypeAnalysisResult(
+    public SuccessfulTypeAnalysis(
         IReadOnlyList<ConstructorParameter> constructorParameters,
         IReadOnlyList<ConstructorParameter> baseClassConstructorParameters,
         IReadOnlyList<Diagnostic> diagnostics)

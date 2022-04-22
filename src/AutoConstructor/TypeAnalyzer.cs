@@ -27,7 +27,10 @@ public class TypeAnalyzer
     private readonly ClassDeclarationSyntax _declarationSyntax;
     private readonly AutoConstructorAttribute _attribute;
 
-    public TypeAnalyzer(INamedTypeSymbol classSymbol, ClassDeclarationSyntax declarationSyntax, AutoConstructorAttribute attribute)
+    public TypeAnalyzer(
+        INamedTypeSymbol classSymbol,
+        ClassDeclarationSyntax declarationSyntax,
+        AutoConstructorAttribute attribute)
     {
         _classSymbol = classSymbol;
         _declarationSyntax = declarationSyntax;
@@ -36,19 +39,19 @@ public class TypeAnalyzer
 
     public INamedTypeSymbol ClassSymbol { get => _classSymbol; }
 
-    public IncompleteTypeAnalysisResult AnalyzeType()
+    public IncompleteTypeAnalysis AnalyzeType()
     {
         if (!_declarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PartialKeyword)))
         {
-            return IncompleteTypeAnalysisResult.From(Diagnostic.Create(
+            return IncompleteTypeAnalysis.From(Diagnostic.Create(
                 DiagnosticDescriptors.ClassMustBePartial,
                 _declarationSyntax.GetLocation(),
                 _classSymbol.Name));
         }
 
-        IncompleteTypeAnalysisResult baseClassAnalysis = GetBaseClassMembers();
+        IncompleteTypeAnalysis baseClassAnalysis = GetBaseClassMembers();
 
-        if (baseClassAnalysis is not TypeAnalysisResult successfulParentAnalysis)
+        if (baseClassAnalysis is not SuccessfulTypeAnalysis successfulParentAnalysis)
             return baseClassAnalysis;
 
         IReadOnlyList<ConstructorParameter> baseClassMembers = successfulParentAnalysis.BaseClassConstructorParameters
@@ -68,14 +71,14 @@ public class TypeAnalyzer
 
         if (duplicates.Count > 0)
         {
-            return IncompleteTypeAnalysisResult.From(Diagnostic.Create(
+            return IncompleteTypeAnalysis.From(Diagnostic.Create(
                 DiagnosticDescriptors.DuplicateConstructorParameter,
                 _declarationSyntax.GetLocation(),
                 duplicates[0].ParameterName,
                 _classSymbol.Name));
         }
 
-        return new TypeAnalysisResult(
+        return new SuccessfulTypeAnalysis(
             constructorParameters: members,
             baseClassConstructorParameters: baseClassMembers,
             diagnostics: Array.Empty<Diagnostic>());
@@ -207,35 +210,40 @@ public class TypeAnalyzer
 
     private static string GetParameterName(string symbolName)
     {
-        symbolName = @symbolName.TrimStart('_', '@');
+        symbolName = symbolName.TrimStart('_', '@');
         return symbolName.Substring(0, 1).ToLowerInvariant() + symbolName.Substring(1);
     }
 
-    private IncompleteTypeAnalysisResult GetBaseClassMembers()
+    private IncompleteTypeAnalysis GetBaseClassMembers()
     {
         if (_classSymbol.BaseType != null)
         {
             AutoConstructorAttribute? parentAttribute = _classSymbol.BaseType.GetAttribute<AutoConstructorAttribute>();
             if (parentAttribute != null)
             {
-                TypeAnalyzer parentAnalyzer = new(_classSymbol.BaseType, _declarationSyntax, parentAttribute);
-                IncompleteTypeAnalysisResult parentResult = parentAnalyzer.AnalyzeType();
+                TypeAnalyzer parentAnalyzer = new(
+                    _classSymbol.BaseType,
+                    (ClassDeclarationSyntax)_classSymbol.BaseType.DeclaringSyntaxReferences.ElementAt(0).GetSyntax(),
+                    parentAttribute);
 
-                if (parentResult is not TypeAnalysisResult successfulResult)
-                    return IncompleteTypeAnalysisResult.From();
+                IncompleteTypeAnalysis parentResult = parentAnalyzer.AnalyzeType();
+
+                if (parentResult is not SuccessfulTypeAnalysis successfulResult)
+                    return IncompleteTypeAnalysis.From();
                 else
                     return successfulResult;
             }
             else
             {
                 if (_classSymbol.BaseType.InstanceConstructors.Any(constructor =>
-                    constructor.Parameters.Length == 0 && constructor.DeclaredAccessibility != Accessibility.Private))
+                    constructor.Parameters.Length == 0
+                    && constructor.DeclaredAccessibility != Accessibility.Private))
                 {
-                    return TypeAnalysisResult.Empty;
+                    return SuccessfulTypeAnalysis.Empty;
                 }
                 else
                 {
-                    return IncompleteTypeAnalysisResult.From(Diagnostic.Create(
+                    return IncompleteTypeAnalysis.From(Diagnostic.Create(
                         DiagnosticDescriptors.BaseClassMustHaveAttribute,
                         _declarationSyntax.GetLocation(),
                         _classSymbol.Name));
@@ -244,7 +252,7 @@ public class TypeAnalyzer
         }
         else
         {
-            return TypeAnalysisResult.Empty;
+            return SuccessfulTypeAnalysis.Empty;
         }
     }
 }

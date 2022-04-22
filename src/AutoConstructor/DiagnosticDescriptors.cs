@@ -36,7 +36,8 @@ public class DiagnosticDescriptors
 
     public static DiagnosticDescriptor BaseClassMustHaveAttribute { get; } = new(
         id: "AC0003",
-        title: "The base class of classes decorated with [AutoConstructor] must be decorated with [AutoConstructor]",
+        title: "The base class of classes decorated with [AutoConstructor] must be decorated with [AutoConstructor]"
+            + " or have a parameterless constructor",
         messageFormat: "Decorate the parent class of '{0}' with [AutoConstructor].",
         category: "AutoConstructor",
         DiagnosticSeverity.Error,

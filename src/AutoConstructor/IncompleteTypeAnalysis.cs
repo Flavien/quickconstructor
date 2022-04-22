@@ -18,17 +18,17 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-public record IncompleteTypeAnalysisResult
+public record IncompleteTypeAnalysis
 {
-    public IncompleteTypeAnalysisResult(IReadOnlyList<Diagnostic> diagnostics)
+    public IncompleteTypeAnalysis(IReadOnlyList<Diagnostic> diagnostics)
     {
         Diagnostics = diagnostics;
     }
 
     public IReadOnlyList<Diagnostic> Diagnostics { get; }
 
-    public static IncompleteTypeAnalysisResult From(params Diagnostic[] diagnostics)
+    public static IncompleteTypeAnalysis From(params Diagnostic[] diagnostics)
     {
-        return new IncompleteTypeAnalysisResult(diagnostics.ToList().AsReadOnly());
+        return new IncompleteTypeAnalysis(diagnostics.ToList().AsReadOnly());
     }
 }

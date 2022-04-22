@@ -44,12 +44,12 @@ public class AutoConstructorGenerator : ISourceGenerator
         Dictionary<string, int> classNames = new(StringComparer.Ordinal);
         foreach (TypeAnalyzer typeAnalyzer in GetClassSymbols(context, receiver))
         {
-            IncompleteTypeAnalysisResult result = typeAnalyzer.AnalyzeType();
+            IncompleteTypeAnalysis result = typeAnalyzer.AnalyzeType();
 
             foreach (Diagnostic diagnostic in result.Diagnostics)
                 context.ReportDiagnostic(diagnostic);
 
-            if (result is not TypeAnalysisResult successfulResult)
+            if (result is not SuccessfulTypeAnalysis successfulResult)
                 continue;
 
             string symbolName = typeAnalyzer.ClassSymbol.Name;
