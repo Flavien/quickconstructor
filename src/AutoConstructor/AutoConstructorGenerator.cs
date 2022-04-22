@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using AutoConstructor.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -70,12 +71,7 @@ public class AutoConstructorGenerator : ISourceGenerator
 
             context.AddSource(
                 $"{name}.g.cs",
-                SourceText.From(
-                    _sourceRenderer.Render(
-                        classSymbolProcessor.ClassSymbol,
-                        constructorDescriptor.ConstructorParameters,
-                        constructorDescriptor.BaseClassConstructorParameters),
-                    Encoding.UTF8));
+                SourceText.From(_sourceRenderer.Render(constructorDescriptor), Encoding.UTF8));
         }
     }
 

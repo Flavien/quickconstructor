@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor;
+namespace AutoConstructor.Attributes;
 
-using System;
-
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-public class AutoConstructorParameterAttribute : Attribute
+public enum Accessibility
 {
-    public string? Name { get; set; } = null;
-
-    public bool IncludeAttributes { get; set; } = true;
+    Public,
+    Protected,
+    Internal,
+    Private
 }

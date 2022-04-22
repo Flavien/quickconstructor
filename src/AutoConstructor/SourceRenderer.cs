@@ -14,10 +14,12 @@
 
 namespace AutoConstructor;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Accessibility = Attributes.Accessibility;
 
 public class SourceRenderer
 {
@@ -26,13 +28,15 @@ public class SourceRenderer
             SymbolDisplayFormat.FullyQualifiedFormat.MiscellaneousOptions
             | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
 
-    public string Render(
-        INamedTypeSymbol classSymbol,
-        IReadOnlyList<ConstructorParameter> parameters,
-        IReadOnlyList<ConstructorParameter> baseClassParameters)
+    public string Render(ConstructorDescriptor constructorDescriptor)
     {
+        INamedTypeSymbol classSymbol = constructorDescriptor.ClassSymbol;
+        IReadOnlyList<ConstructorParameter> parameters = constructorDescriptor.ConstructorParameters;
+        IReadOnlyList<ConstructorParameter> baseClassParameters = constructorDescriptor.BaseClassConstructorParameters;
+
         IEnumerable<ConstructorParameter> allParameters = baseClassParameters.Concat(parameters);
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
+        string accessibility = GetAccessModifier(constructorDescriptor.Accessibility);
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", allParameters.Select(parameter => RenderParameter(parameter)));
         string baseClassConstructor = CreateBaseClassConstructor(baseClassParameters);
@@ -41,7 +45,7 @@ public class SourceRenderer
         string namespaceContents = $@"
                 partial class {classDeclaration}
                 {{
-                    public {classSymbol.Name}({parameterDeclarations})
+                    {accessibility} {classSymbol.Name}({parameterDeclarations})
                         {baseClassConstructor}
                     {{
                         {nullChecks}
@@ -128,5 +132,16 @@ public class SourceRenderer
         IEnumerable<string> argumentList = baseClassParameters.Select(argument => "@" + argument.ParameterName);
 
         return $": base({string.Join(", ", argumentList)})";
+    }
+
+    private string GetAccessModifier(Accessibility accessibility)
+    {
+        return accessibility switch
+        {
+            Accessibility.Private => "private",
+            Accessibility.Internal => "internal",
+            Accessibility.Protected => "protected",
+            _ => "public"
+        };
     }
 }

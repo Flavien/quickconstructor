@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor;
+namespace AutoConstructor.Attributes;
 
 using System;
 
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public class AutoConstructorAttribute : Attribute
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+public class AutoConstructorParameterAttribute : Attribute
 {
-    public bool IncludeNonReadOnlyMembers { get; set; }
+    public string? Name { get; set; } = null;
 
-    public NullChecksSettings NullChecks { get; set; } = NullChecksSettings.NonNullableReferencesOnly;
+    public bool IncludeAttributes { get; set; } = true;
 }

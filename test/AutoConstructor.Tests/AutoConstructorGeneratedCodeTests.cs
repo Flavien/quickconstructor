@@ -18,10 +18,12 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
+using Accessibility = AutoConstructor.Attributes.Accessibility;
 
 public class AutoConstructorGeneratedCodeTests
 {
@@ -344,6 +346,33 @@ public class AutoConstructorGeneratedCodeTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
+    [Theory]
+    [InlineData(Accessibility.Public, "public")]
+    [InlineData(Accessibility.Protected, "protected")]
+    [InlineData(Accessibility.Private, "private")]
+    [InlineData(Accessibility.Internal, "internal")]
+    public async Task Rendering_Accessibility(Accessibility accessibility, string keyword)
+    {
+        string sourceCode = $@"
+            [AutoConstructor(ConstructorAccessibility = Accessibility.{accessibility})]
+            partial class TestClass
+            {{
+                private readonly int fieldOne;
+            }}";
+
+        string generatedCode = $@"
+            partial class TestClass
+            {{
+                {keyword} TestClass(
+                    int @fieldOne)
+                {{
+                    this.@fieldOne = @fieldOne;
+                }}
+            }}";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
     [Fact]
     public async Task SyntaxTree_Partial()
     {
@@ -378,11 +407,11 @@ public class AutoConstructorGeneratedCodeTests
     [InlineData("AutoConstructor")]
     [InlineData("AutoConstructor()")]
     [InlineData("AutoConstructorAttribute")]
-    [InlineData("AutoConstructor.AutoConstructor")]
-    [InlineData("AutoConstructor.AutoConstructorAttribute")]
-    [InlineData("global::AutoConstructor.AutoConstructor")]
-    [InlineData("global::AutoConstructor.AutoConstructorAttribute")]
-    [InlineData("global::AutoConstructor.AutoConstructorAttribute()")]
+    [InlineData("AutoConstructor.Attributes.AutoConstructor")]
+    [InlineData("AutoConstructor.Attributes.AutoConstructorAttribute")]
+    [InlineData("global::AutoConstructor.Attributes.AutoConstructor")]
+    [InlineData("global::AutoConstructor.Attributes.AutoConstructorAttribute")]
+    [InlineData("global::AutoConstructor.Attributes.AutoConstructorAttribute()")]
     public async Task SyntaxTree_AttributeSyntax(string attributeSyntax)
     {
         string sourceCode = $@"
@@ -601,7 +630,7 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     $@"
                     #nullable enable
-                    using AutoConstructor;
+                    using AutoConstructor.Attributes;
                     namespace TestNamespace
                     {{
                         {sourceCode}

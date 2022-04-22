@@ -15,16 +15,27 @@
 namespace AutoConstructor;
 
 using System.Collections.Generic;
+using AutoConstructor.Attributes;
+using Microsoft.CodeAnalysis;
+using Accessibility = Attributes.Accessibility;
 
 public record ConstructorDescriptor
 {
     public ConstructorDescriptor(
+        INamedTypeSymbol classSymbol,
+        Accessibility accessibility,
         IReadOnlyList<ConstructorParameter> constructorParameters,
         IReadOnlyList<ConstructorParameter> baseClassConstructorParameters)
     {
+        ClassSymbol = classSymbol;
+        Accessibility = accessibility;
         ConstructorParameters = constructorParameters;
         BaseClassConstructorParameters = baseClassConstructorParameters;
     }
+
+    public INamedTypeSymbol ClassSymbol { get; }
+
+    public Accessibility Accessibility { get; }
 
     public IReadOnlyList<ConstructorParameter> ConstructorParameters { get; }
 

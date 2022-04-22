@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using AutoConstructor.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -74,6 +75,8 @@ public class ClassSymbolProcessor
         }
 
         return new ConstructorDescriptor(
+            _classSymbol,
+            _attribute.ConstructorAccessibility,
             constructorParameters: members,
             baseClassConstructorParameters: baseClassMembers);
     }

@@ -66,7 +66,7 @@ public class AutoConstructorDiagnosticsTests
                 {
                     $@"
                     #nullable enable
-                    using AutoConstructor;
+                    using AutoConstructor.Attributes;
                     namespace TestNamespace
                     {{
                         {sourceCode}

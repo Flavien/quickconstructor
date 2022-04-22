@@ -162,7 +162,7 @@ public class AutoConstructorBaseClassTests
                 {
                     $@"
                     #nullable enable
-                    using AutoConstructor;
+                    using AutoConstructor.Attributes;
                     namespace TestNamespace
                     {{
                         {sourceCode}
