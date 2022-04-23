@@ -14,6 +14,7 @@
 
 namespace AutoConstructor;
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,10 +34,14 @@ public class AutoConstructorGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        IncrementalValuesProvider<(ConstructorDescriptor?, Diagnostic?)> syntaxProvider =
-            context.SyntaxProvider.CreateSyntaxProvider(IsSynataxEligible, ProcessSyntaxNode);
+        IncrementalValuesProvider<ClassSymbolProcessor?> syntaxProvider =
+            context.SyntaxProvider.CreateSyntaxProvider(IsSynataxEligible, ProcessSyntaxNode)
+            .WithComparer(ClassSymbolProcessorComparer.Default);
 
-        context.RegisterSourceOutput(syntaxProvider, (context, result) =>
+        IncrementalValuesProvider<(ConstructorDescriptor?, Diagnostic?)> model =
+            syntaxProvider.Select(ProcessSymbol);
+
+        context.RegisterSourceOutput(model, (context, result) =>
         {
             (ConstructorDescriptor? constructorDescriptor, Diagnostic? diagnostic) = result;
 
@@ -66,27 +71,35 @@ public class AutoConstructorGenerator : IIncrementalGenerator
         return true;
     }
 
-    private (ConstructorDescriptor?, Diagnostic?) ProcessSyntaxNode(
+    private ClassSymbolProcessor? ProcessSyntaxNode(
         GeneratorSyntaxContext syntaxContext,
         CancellationToken cancel)
     {
         if (syntaxContext.Node is not AttributeSyntax attributeSyntax)
-            return default;
+            return null;
 
         if (attributeSyntax?.Parent?.Parent is not ClassDeclarationSyntax classDeclarationSyntax)
-            return default;
+            return null;
 
         ISymbol? symbol = syntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, cancel);
 
         if (symbol is not INamedTypeSymbol classSymbol)
-            return default;
+            return null;
 
         AutoConstructorAttribute? attribute = symbol.GetAttribute<AutoConstructorAttribute>();
 
         if (attribute == null)
-            return default;
+            return null;
 
-        ClassSymbolProcessor processor = new(classSymbol, classDeclarationSyntax, attribute);
+        return new ClassSymbolProcessor(classSymbol, classDeclarationSyntax, attribute);
+    }
+
+    private (ConstructorDescriptor?, Diagnostic?) ProcessSymbol(
+        ClassSymbolProcessor? processor,
+        CancellationToken cancel)
+    {
+        if (processor == null)
+            return default;
 
         try
         {
@@ -95,6 +108,21 @@ public class AutoConstructorGenerator : IIncrementalGenerator
         catch (AutoConstructorException exception)
         {
             return (null, exception.Diagnostic);
+        }
+    }
+
+    private class ClassSymbolProcessorComparer : IEqualityComparer<ClassSymbolProcessor?>
+    {
+        public static ClassSymbolProcessorComparer Default { get; } = new ClassSymbolProcessorComparer();
+
+        public bool Equals(ClassSymbolProcessor? x, ClassSymbolProcessor? y)
+        {
+            return SymbolEqualityComparer.Default.Equals(x?.ClassSymbol, y?.ClassSymbol);
+        }
+
+        public int GetHashCode(ClassSymbolProcessor? obj)
+        {
+            return SymbolEqualityComparer.Default.GetHashCode(obj?.ClassSymbol);
         }
     }
 }
