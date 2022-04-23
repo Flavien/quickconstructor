@@ -14,12 +14,11 @@
 
 namespace AutoConstructor;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CSharpier;
 using Microsoft.CodeAnalysis;
-using Accessibility = Attributes.Accessibility;
 
 public class SourceRenderer
 {
@@ -60,20 +59,20 @@ public class SourceRenderer
             currentSymbol = currentSymbol.ContainingType;
             namespaceContents = $@"
                 partial class {currentSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}
-                {{{namespaceContents.Indent(4)}
+                {{
+                    {namespaceContents}
                 }}";
         }
 
         string source = $@"
             #nullable enable
+
             namespace {namespaceName}
-            {{{namespaceContents}
+            {{
+                {namespaceContents}
             }}";
 
-        return source
-            .TrimMultiline(12)
-            .RemoveBlankLines()
-            .TrimStart('\r', '\n');
+        return CodeFormatter.Format(source);
     }
 
     public string RenderParameter(ConstructorParameter parameter)
@@ -81,7 +80,6 @@ public class SourceRenderer
         StringBuilder stringBuilder = new();
 
         stringBuilder.AppendLine();
-        stringBuilder.Append(' ', 24);
 
         foreach (AttributeData attribute in parameter.Attributes)
             stringBuilder.Append($"[{attribute}] ");
@@ -98,30 +96,16 @@ public class SourceRenderer
         if (!parameter.NullCheck)
             return string.Empty;
 
-        StringBuilder stringBuilder = new();
-
-        stringBuilder.AppendLine();
-        stringBuilder.Append(' ', 24);
-        stringBuilder.AppendLine($"if (@{ parameter.ParameterName} == null)");
-        stringBuilder.Append(' ', 24);
-        stringBuilder.AppendLine($"    throw new System.ArgumentNullException(nameof(@{ parameter.ParameterName }));");
-
-        return stringBuilder.ToString();
+        return @$"
+            if (@{ parameter.ParameterName } == null)
+                throw new System.ArgumentNullException(nameof(@{ parameter.ParameterName }));
+        ";
     }
 
     private string RenderAssignment(ConstructorParameter parameter)
     {
-        StringBuilder stringBuilder = new();
-
-        stringBuilder.AppendLine();
-        stringBuilder.Append(' ', 24);
-        stringBuilder.Append("this.@");
-        stringBuilder.Append(parameter.Symbol.Name);
-        stringBuilder.Append(" = @");
-        stringBuilder.Append(parameter.ParameterName);
-        stringBuilder.Append(';');
-
-        return stringBuilder.ToString();
+        return $@"
+            this.@{parameter.Symbol.Name} = @{parameter.ParameterName};";
     }
 
     private string CreateBaseClassConstructor(IReadOnlyList<ConstructorParameter> baseClassParameters)
@@ -134,13 +118,13 @@ public class SourceRenderer
         return $": base({string.Join(", ", argumentList)})";
     }
 
-    private string GetAccessModifier(Accessibility accessibility)
+    private string GetAccessModifier(Attributes.Accessibility accessibility)
     {
         return accessibility switch
         {
-            Accessibility.Private => "private",
-            Accessibility.Internal => "internal",
-            Accessibility.Protected => "protected",
+            Attributes.Accessibility.Private => "private",
+            Attributes.Accessibility.Internal => "internal",
+            Attributes.Accessibility.Protected => "protected",
             _ => "public"
         };
     }

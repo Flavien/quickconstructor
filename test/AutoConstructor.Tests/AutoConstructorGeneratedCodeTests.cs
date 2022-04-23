@@ -17,6 +17,7 @@ namespace AutoConstructor.Tests;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using CSharpier;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
@@ -228,16 +229,22 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     if (@class == null)
                         throw new System.ArgumentNullException(nameof(@class));
+
                     if (@underscoreField == null)
                         throw new System.ArgumentNullException(nameof(@underscoreField));
+
                     if (@number1 == null)
                         throw new System.ArgumentNullException(nameof(@number1));
+
                     if (@é == null)
                         throw new System.ArgumentNullException(nameof(@é));
+
                     if (@你好 == null)
                         throw new System.ArgumentNullException(nameof(@你好));
+
                     if (@return == null)
                         throw new System.ArgumentNullException(nameof(@return));
+
                     this.@class = @class;
                     this.@_underscoreField = @underscoreField;
                     this.@number1 = @number1;
@@ -270,8 +277,10 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     if (@_ == null)
                         throw new System.ArgumentNullException(nameof(@_));
+
                     if (@_1 == null)
                         throw new System.ArgumentNullException(nameof(@_1));
+
                     this.@_ = @_;
                     this.@_1 = @_1;
                 }
@@ -502,8 +511,10 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     if (@fieldThree == null)
                         throw new System.ArgumentNullException(nameof(@fieldThree));
+
                     if (@fieldFive == null)
                         throw new System.ArgumentNullException(nameof(@fieldFive));
+
                     this.@fieldOne = @fieldOne;
                     this.@fieldTwo = @fieldTwo;
                     this.@fieldThree = @fieldThree;
@@ -541,10 +552,13 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     if (@fieldThree == null)
                         throw new System.ArgumentNullException(nameof(@fieldThree));
+
                     if (@fieldFour == null)
                         throw new System.ArgumentNullException(nameof(@fieldFour));
+
                     if (@fieldFive == null)
                         throw new System.ArgumentNullException(nameof(@fieldFive));
+
                     this.@fieldOne = @fieldOne;
                     this.@fieldTwo = @fieldTwo;
                     this.@fieldThree = @fieldThree;
@@ -650,6 +664,7 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     if (@fieldOne == null)
                         throw new System.ArgumentNullException(nameof(@fieldOne));
+
                     this.@fieldOne = @fieldOne;
                 }
             }";
@@ -659,10 +674,7 @@ public class AutoConstructorGeneratedCodeTests
 
     private static async Task AssertGeneratedCode(string sourceCode, string generatedCode)
     {
-        string trimmedCode = generatedCode.TrimMultiline(8);
-
-        string eol = Environment.NewLine;
-        string fullGeneratedCode = $"#nullable enable{eol}namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";
+        string fullGeneratedCode = CreateExpectedFile(generatedCode);
 
         CSharpIncrementalGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
@@ -692,5 +704,18 @@ public class AutoConstructorGeneratedCodeTests
         tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorGenerator).Assembly);
 
         await tester.RunAsync();
+    }
+
+    private static string CreateExpectedFile(string generatedCode)
+    {
+        string fullGeneratedCode = $@"
+            #nullable enable
+
+            namespace TestNamespace
+            {{
+                {generatedCode}
+            }}";
+
+        return CodeFormatter.Format(fullGeneratedCode);
     }
 }

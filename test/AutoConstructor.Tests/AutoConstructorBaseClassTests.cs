@@ -17,6 +17,7 @@ namespace AutoConstructor.Tests;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using CSharpier;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
@@ -186,10 +187,14 @@ public class AutoConstructorBaseClassTests
 
     private static string CreateExpectedFile(string generatedCode)
     {
-        string trimmedCode = generatedCode.TrimMultiline(8);
+        string fullGeneratedCode = $@"
+            #nullable enable
 
-        string eol = Environment.NewLine;
-        string fullGeneratedCode = $"#nullable enable{eol}namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";
-        return fullGeneratedCode;
+            namespace TestNamespace
+            {{
+                {generatedCode}
+            }}";
+
+        return CodeFormatter.Format(fullGeneratedCode);
     }
 }

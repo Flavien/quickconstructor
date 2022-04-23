@@ -33,7 +33,7 @@ public class AutoConstructorDiagnosticsTests
         await AssertDiagnostic(
             sourceCode,
             new DiagnosticResult(DiagnosticDescriptors.ClassMustBePartial)
-                .WithSpan(7, 13, 10, 14)
+                .WithSpan(8, 26, 8, 35)
                 .WithArguments("TestClass"));
     }
 
@@ -51,7 +51,7 @@ public class AutoConstructorDiagnosticsTests
         await AssertDiagnostic(
             sourceCode,
             new DiagnosticResult(DiagnosticDescriptors.DuplicateConstructorParameter)
-                .WithSpan(7, 13, 12, 14)
+                .WithSpan(8, 27, 8, 36)
                 .WithArguments("value", "TestClass"));
     }
 
