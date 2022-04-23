@@ -35,7 +35,7 @@ public class AutoConstructorGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         IncrementalValuesProvider<ClassSymbolProcessor?> syntaxProvider =
-            context.SyntaxProvider.CreateSyntaxProvider(IsSynataxEligible, ProcessSyntaxNode)
+            context.SyntaxProvider.CreateSyntaxProvider(IsCandidate, ProcessSyntaxNode)
             .WithComparer(ClassSymbolProcessorComparer.Default);
 
         IncrementalValuesProvider<(ConstructorDescriptor?, Diagnostic?)> model =
@@ -57,12 +57,12 @@ public class AutoConstructorGenerator : IIncrementalGenerator
         });
     }
 
-    public bool IsSynataxEligible(SyntaxNode syntaxNode, CancellationToken cancel)
+    public bool IsCandidate(SyntaxNode syntaxNode, CancellationToken cancel)
     {
         if (syntaxNode is not AttributeSyntax attribute)
             return false;
 
-        if (attribute?.Parent?.Parent is not ClassDeclarationSyntax classDeclarationSyntax)
+        if (attribute?.Parent?.Parent is not ClassDeclarationSyntax)
             return false;
 
         if (!_attributeSyntaxRegex.IsMatch(attribute.Name.ToString()))

@@ -18,12 +18,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AutoConstructor.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public class ClassMembersAnalyzer
 {
+    private static readonly Regex _identifierTrim = new(
+        @"^[^\p{L}]+",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     private readonly INamedTypeSymbol _classSymbol;
     private readonly AutoConstructorAttribute _attribute;
 
@@ -161,12 +166,15 @@ public class ClassMembersAnalyzer
                 type: type,
                 parameterName: parameterName,
                 nullCheck: nullCheck,
-                attributes: attributeData);
+                attributes: ImmutableArray.CreateRange(attributeData));
     }
 
     private static string GetParameterName(string symbolName)
     {
-        symbolName = symbolName.TrimStart('_', '@');
-        return symbolName.Substring(0, 1).ToLowerInvariant() + symbolName.Substring(1);
+        string trimmedParameterName = _identifierTrim.Replace(symbolName, "");
+        if (trimmedParameterName == string.Empty)
+            return symbolName;
+        else
+            return trimmedParameterName.Substring(0, 1).ToLowerInvariant() + trimmedParameterName.Substring(1);
     }
 }

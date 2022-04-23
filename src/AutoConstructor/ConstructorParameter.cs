@@ -14,7 +14,7 @@
 
 namespace AutoConstructor;
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 public record ConstructorParameter
@@ -24,7 +24,7 @@ public record ConstructorParameter
         ITypeSymbol type,
         string parameterName,
         bool nullCheck,
-        IReadOnlyList<AttributeData> attributes)
+        ImmutableArray<AttributeData> attributes)
     {
         Symbol = symbol;
         Type = type;
@@ -41,5 +41,5 @@ public record ConstructorParameter
 
     public bool NullCheck { get; }
 
-    public IReadOnlyList<AttributeData> Attributes { get; }
+    public ImmutableArray<AttributeData> Attributes { get; }
 }

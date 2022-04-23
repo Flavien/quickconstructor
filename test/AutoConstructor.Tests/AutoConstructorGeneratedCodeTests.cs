@@ -1,4 +1,4 @@
-// Copyright 2022 Flavien Charlon
+﻿// Copyright 2022 Flavien Charlon
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -172,7 +172,7 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
-    public async Task ParameterName_AutoConstructorParameter()
+    public async Task ParameterName_OverrideName()
     {
         string sourceCode = @"
             [AutoConstructor]
@@ -201,7 +201,7 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
-    public async Task ParameterName_Default()
+    public async Task ParameterName_ToCamelCase()
     {
         string sourceCode = @"
             [AutoConstructor]
@@ -209,6 +209,9 @@ public class AutoConstructorGeneratedCodeTests
             {
                 private readonly string @class;
                 private readonly string _underscoreField;
+                private readonly string number1;
+                private readonly string É;
+                private readonly string 你好;
                 public string Return { get; }
             }";
 
@@ -218,17 +221,59 @@ public class AutoConstructorGeneratedCodeTests
                 public TestClass(
                     string @class,
                     string @underscoreField,
+                    string @number1,
+                    string @é,
+                    string @你好,
                     string @return)
                 {
                     if (@class == null)
                         throw new System.ArgumentNullException(nameof(@class));
                     if (@underscoreField == null)
                         throw new System.ArgumentNullException(nameof(@underscoreField));
+                    if (@number1 == null)
+                        throw new System.ArgumentNullException(nameof(@number1));
+                    if (@é == null)
+                        throw new System.ArgumentNullException(nameof(@é));
+                    if (@你好 == null)
+                        throw new System.ArgumentNullException(nameof(@你好));
                     if (@return == null)
                         throw new System.ArgumentNullException(nameof(@return));
                     this.@class = @class;
                     this.@_underscoreField = @underscoreField;
+                    this.@number1 = @number1;
+                    this.@É = @é;
+                    this.@你好 = @你好;
                     this.@Return = @return;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task ParameterName_Unchanged()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+                private readonly string @_;
+                private readonly string _1;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    string @_,
+                    string @_1)
+                {
+                    if (@_ == null)
+                        throw new System.ArgumentNullException(nameof(@_));
+                    if (@_1 == null)
+                        throw new System.ArgumentNullException(nameof(@_1));
+                    this.@_ = @_;
+                    this.@_1 = @_1;
                 }
             }";
 

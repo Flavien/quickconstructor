@@ -47,7 +47,7 @@ public class ClassSymbolProcessor
         {
             throw new AutoConstructorException(Diagnostic.Create(
                 DiagnosticDescriptors.ClassMustBePartial,
-                _declarationSyntax.GetLocation(),
+                _declarationSyntax.Identifier.GetLocation(),
                 _classSymbol.Name));
         }
 
@@ -69,7 +69,7 @@ public class ClassSymbolProcessor
         {
             throw new AutoConstructorException(Diagnostic.Create(
                 DiagnosticDescriptors.DuplicateConstructorParameter,
-                _declarationSyntax.GetLocation(),
+                _declarationSyntax.Identifier.GetLocation(),
                 duplicates[0].ParameterName,
                 _classSymbol.Name));
         }
