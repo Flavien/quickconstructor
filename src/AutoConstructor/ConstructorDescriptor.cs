@@ -14,8 +14,7 @@
 
 namespace AutoConstructor;
 
-using System.Collections.Generic;
-using AutoConstructor.Attributes;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Accessibility = Attributes.Accessibility;
 
@@ -24,8 +23,8 @@ public record ConstructorDescriptor
     public ConstructorDescriptor(
         INamedTypeSymbol classSymbol,
         Accessibility accessibility,
-        IReadOnlyList<ConstructorParameter> constructorParameters,
-        IReadOnlyList<ConstructorParameter> baseClassConstructorParameters)
+        ImmutableArray<ConstructorParameter> constructorParameters,
+        ImmutableArray<ConstructorParameter> baseClassConstructorParameters)
     {
         ClassSymbol = classSymbol;
         Accessibility = accessibility;
@@ -37,7 +36,7 @@ public record ConstructorDescriptor
 
     public Accessibility Accessibility { get; }
 
-    public IReadOnlyList<ConstructorParameter> ConstructorParameters { get; }
+    public ImmutableArray<ConstructorParameter> ConstructorParameters { get; }
 
-    public IReadOnlyList<ConstructorParameter> BaseClassConstructorParameters { get; }
+    public ImmutableArray<ConstructorParameter> BaseClassConstructorParameters { get; }
 }

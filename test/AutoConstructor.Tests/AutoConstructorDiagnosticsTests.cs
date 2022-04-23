@@ -15,7 +15,6 @@
 namespace AutoConstructor.Tests;
 
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Xunit;
@@ -58,7 +57,7 @@ public class AutoConstructorDiagnosticsTests
 
     private static async Task AssertDiagnostic(string sourceCode, DiagnosticResult diagnostic)
     {
-        CSharpSourceGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
+        CSharpIncrementalGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
             TestState =
             {

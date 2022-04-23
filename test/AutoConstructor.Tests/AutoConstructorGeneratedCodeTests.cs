@@ -16,10 +16,7 @@ namespace AutoConstructor.Tests;
 
 using System;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
@@ -622,7 +619,7 @@ public class AutoConstructorGeneratedCodeTests
         string eol = Environment.NewLine;
         string fullGeneratedCode = $"#nullable enable{eol}namespace TestNamespace{eol}{{{trimmedCode}{eol}}}";
 
-        CSharpSourceGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
+        CSharpIncrementalGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
             TestState =
             {
@@ -640,7 +637,7 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     (
                         typeof(AutoConstructorGenerator),
-                        $"TestClass.g.cs",
+                        $"TestClass.cs",
                         SourceText.From(fullGeneratedCode, Encoding.UTF8)
                     ),
                 }

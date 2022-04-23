@@ -154,7 +154,7 @@ public class AutoConstructorBaseClassTests
 
     private static async Task AssertGeneratedCode(string sourceCode, params (string name, string code)[] expected)
     {
-        CSharpSourceGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
+        CSharpIncrementalGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
         {
             TestState =
             {
@@ -177,7 +177,7 @@ public class AutoConstructorBaseClassTests
         {
             tester.TestState.GeneratedSources.Add((
                 typeof(AutoConstructorGenerator),
-                $"{name}.g.cs",
+                $"{name}.cs",
                 SourceText.From(CreateExpectedFile(code), Encoding.UTF8)));
         }
 

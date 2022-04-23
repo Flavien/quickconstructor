@@ -41,7 +41,7 @@ public class ClassSymbolProcessor
 
     public INamedTypeSymbol ClassSymbol { get => _classSymbol; }
 
-    public ConstructorDescriptor AnalyzeType()
+    public ConstructorDescriptor GetConstructorDescriptor()
     {
         if (!_declarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PartialKeyword)))
         {
@@ -52,9 +52,9 @@ public class ClassSymbolProcessor
         }
 
         ClassMembersAnalyzer classMembersAnalyzer = new(_classSymbol, _attribute);
-        IReadOnlyList<ConstructorParameter> members = classMembersAnalyzer.GetConstructorParameters();
+        ImmutableArray<ConstructorParameter> members = classMembersAnalyzer.GetConstructorParameters();
 
-        IReadOnlyList<ConstructorParameter> baseClassMembers = ImmutableArray
+        ImmutableArray<ConstructorParameter> baseClassMembers = ImmutableArray
             .CreateRange(GetRecursiveClassMembers(_classSymbol.BaseType));
 
         ILookup<string, ConstructorParameter> lookup = members
