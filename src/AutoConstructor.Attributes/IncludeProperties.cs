@@ -14,9 +14,9 @@
 
 namespace AutoConstructor.Attributes;
 
-public enum NullChecksSettings
+public enum IncludeProperties
 {
-    Always,
-    Never,
-    NonNullableReferencesOnly
+    None,
+    ReadOnlyProperties,
+    AllProperties
 }

@@ -15,7 +15,7 @@
 namespace AutoConstructor.Attributes;
 
 /// <summary>
-/// Represents a member accessibility level.
+/// Represents the accessibility level of a constructor.
 /// </summary>
 public enum Accessibility
 {

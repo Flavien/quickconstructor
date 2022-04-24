@@ -49,18 +49,22 @@ public class ClassMembersAnalyzer
     {
         foreach (IFieldSymbol field in _classSymbol.GetMembers().OfType<IFieldSymbol>())
         {
-            AutoConstructorParameterAttribute? attribute = field.GetAttribute<AutoConstructorParameterAttribute>();
-
             if (ExcludeMember(field))
-                continue;
-
-            if (!_attribute.IncludeNonReadOnlyMembers && !field.IsReadOnly && attribute == null)
                 continue;
 
             if (HasFieldInitializer(field))
                 continue;
 
-            yield return CreateParameter(field, field.Type, attribute);
+            AutoConstructorParameterAttribute? attribute = field.GetAttribute<AutoConstructorParameterAttribute>();
+
+            bool include = attribute != null || _attribute.Fields switch
+            {
+                IncludeFields.AllFields => true,
+                _ => field.IsReadOnly
+            };
+
+            if (include)
+                yield return CreateParameter(field, field.Type, attribute);
         }
     }
 
@@ -68,28 +72,32 @@ public class ClassMembersAnalyzer
     {
         foreach (IPropertySymbol property in _classSymbol.GetMembers().OfType<IPropertySymbol>())
         {
-            AutoConstructorParameterAttribute? attribute = property.GetAttribute<AutoConstructorParameterAttribute>();
-
             if (ExcludeMember(property))
-                continue;
-
-            if (!_attribute.IncludeNonReadOnlyMembers && !property.IsReadOnly && attribute == null)
-                continue;
-
-            if (!IsAutoProperty(property))
                 continue;
 
             if (HasPropertyInitializer(property))
                 continue;
 
-            yield return CreateParameter(property, property.Type, attribute);
+            if (property.IsReadOnly && !IsAutoProperty(property))
+                continue;
+
+            AutoConstructorParameterAttribute? attribute = property.GetAttribute<AutoConstructorParameterAttribute>();
+
+            bool include = attribute != null || _attribute.Properties switch
+            {
+                IncludeProperties.None => false,
+                IncludeProperties.AllProperties => true,
+                _ => property.IsReadOnly
+            };
+
+            if (include)
+                yield return CreateParameter(property, property.Type, attribute);
         }
     }
 
     public static bool ExcludeMember(ISymbol member)
     {
-        return !member.CanBeReferencedByName
-            || member.IsStatic;
+        return !member.CanBeReferencedByName || member.IsStatic;
     }
 
     private static bool HasFieldInitializer(IFieldSymbol symbol)
@@ -154,9 +162,9 @@ public class ClassMembersAnalyzer
         }
 
         bool nullCheck;
-        if (_attribute.NullChecks == NullChecksSettings.NonNullableReferencesOnly)
+        if (_attribute.NullChecks == NullChecks.NonNullableReferencesOnly)
             nullCheck = !type.IsValueType && type.NullableAnnotation == NullableAnnotation.NotAnnotated;
-        else if (_attribute.NullChecks == NullChecksSettings.Always)
+        else if (_attribute.NullChecks == NullChecks.Always)
             nullCheck = !type.IsValueType;
         else
             nullCheck = false;

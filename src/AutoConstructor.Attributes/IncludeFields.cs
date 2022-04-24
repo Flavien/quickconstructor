@@ -14,18 +14,8 @@
 
 namespace AutoConstructor.Attributes;
 
-using System;
-using System.Diagnostics;
-
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-[Conditional("INCLUDE_AUTO_CONSTRUCTOR_ATTRIBUTES")]
-public class AutoConstructorAttribute : Attribute
+public enum IncludeFields
 {
-    public IncludeFields Fields { get; set; } = IncludeFields.ReadOnlyFields;
-
-    public IncludeProperties Properties { get; set; } = IncludeProperties.ReadOnlyProperties;
-
-    public NullChecks NullChecks { get; set; } = NullChecks.NonNullableReferencesOnly;
-
-    public Accessibility ConstructorAccessibility { get; set; } = Accessibility.Public;
+    ReadOnlyFields,
+    AllFields
 }

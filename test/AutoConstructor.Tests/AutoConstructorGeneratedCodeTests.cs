@@ -27,12 +27,109 @@ using Accessibility = AutoConstructor.Attributes.Accessibility;
 public class AutoConstructorGeneratedCodeTests
 {
     [Fact]
-    public async Task MemberSelection_EmptyClass()
+    public async Task IncludeFields_ReadOnlyFields()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields)]
             partial class TestClass
             {
+                private readonly int fieldOne;
+                private static readonly int fieldTwo;
+                private int fieldThree;
+                private readonly int fieldFour = 10;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task IncludeFields_AllFields()
+    {
+        string sourceCode = @"
+            [AutoConstructor(Fields = IncludeFields.AllFields)]
+            partial class TestClass
+            {
+                private readonly int fieldOne;
+                private static readonly int fieldTwo;
+                private int fieldThree;
+                private readonly int fieldFour = 10;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne,
+                    int @fieldThree)
+                {
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldThree = @fieldThree;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task IncludeFields_AutoConstructorParameterAttribute()
+    {
+        string sourceCode = @"
+            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields)]
+            partial class TestClass
+            {
+                [AutoConstructorParameter]
+                private readonly int fieldOne;
+                [AutoConstructorParameter]
+                private static readonly int fieldTwo;
+                [AutoConstructorParameter]
+                private int fieldThree;
+                [AutoConstructorParameter]
+                private readonly int fieldFour = 10;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    int @fieldOne,
+                    int @fieldThree)
+                {
+                    this.@fieldOne = @fieldOne;
+                    this.@fieldThree = @fieldThree;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task IncludeProperties_None()
+    {
+        string sourceCode = @"
+            [AutoConstructor(Properties = IncludeProperties.None)]
+            partial class TestClass
+            {
+                public int PropertyOne { get; }
+                public static int PropertyTwo { get; }
+                public int PropertyThree { get; set; }
+                public int PropertyFour { get; private set; }
+                public int PropertyFive { get => 10; }
+                public int PropertySix { get; } = 10;
+                public int PropertySeven
+                {
+                    get => 0;
+                    set { }
+                }
             }";
 
         string generatedCode = @"
@@ -47,33 +144,31 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
-    public async Task MemberSelection_Default()
+    public async Task IncludeProperties_ReadOnlyProperties()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Properties = IncludeProperties.ReadOnlyProperties)]
             partial class TestClass
             {
-                private readonly int fieldOne;
-                private static readonly int fieldTwo;
-                private int fieldThree;
-                private readonly int fieldFour = 10;
-
                 public int PropertyOne { get; }
                 public static int PropertyTwo { get; }
                 public int PropertyThree { get; set; }
                 public int PropertyFour { get; private set; }
                 public int PropertyFive { get => 10; }
                 public int PropertySix { get; } = 10;
+                public int PropertySeven
+                {
+                    get => 0;
+                    set { }
+                }
             }";
 
         string generatedCode = @"
             partial class TestClass
             {
                 public TestClass(
-                    int @fieldOne,
                     int @propertyOne)
                 {
-                    this.@fieldOne = @fieldOne;
                     this.@PropertyOne = @propertyOne;
                 }
             }";
@@ -82,40 +177,38 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
-    public async Task MemberSelection_IncludeNonReadOnlyMembers()
+    public async Task IncludeProperties_AllProperties()
     {
         string sourceCode = @"
-            [AutoConstructor(IncludeNonReadOnlyMembers = true)]
+            [AutoConstructor(Properties = IncludeProperties.AllProperties)]
             partial class TestClass
             {
-                private readonly int fieldOne;
-                private static readonly int fieldTwo;
-                private int fieldThree;
-                private readonly int fieldFour = 10;
-
                 public int PropertyOne { get; }
                 public static int PropertyTwo { get; }
                 public int PropertyThree { get; set; }
                 public int PropertyFour { get; private set; }
                 public int PropertyFive { get => 10; }
                 public int PropertySix { get; } = 10;
+                public int PropertySeven
+                {
+                    get => 0;
+                    set { }
+                }
             }";
 
         string generatedCode = @"
             partial class TestClass
             {
                 public TestClass(
-                    int @fieldOne,
-                    int @fieldThree,
                     int @propertyOne,
                     int @propertyThree,
-                    int @propertyFour)
+                    int @propertyFour,
+                    int @propertySeven)
                 {
-                    this.@fieldOne = @fieldOne;
-                    this.@fieldThree = @fieldThree;
                     this.@PropertyOne = @propertyOne;
                     this.@PropertyThree = @propertyThree;
                     this.@PropertyFour = @propertyFour;
+                    this.@PropertySeven = @propertySeven;
                 }
             }";
 
@@ -123,21 +216,12 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
-    public async Task MemberSelection_AutoConstructorParameterAttribute()
+    public async Task IncludeProperties_AutoConstructorParameterAttribute()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Properties = IncludeProperties.None)]
             partial class TestClass
             {
-                [AutoConstructorParameter]
-                private readonly int fieldOne;
-                [AutoConstructorParameter]
-                private static readonly int fieldTwo;
-                [AutoConstructorParameter]
-                private int fieldThree;
-                [AutoConstructorParameter]
-                private readonly int fieldFour = 10;
-
                 [AutoConstructorParameter]
                 public int PropertyOne { get; }
                 [AutoConstructorParameter]
@@ -150,23 +234,27 @@ public class AutoConstructorGeneratedCodeTests
                 public int PropertyFive { get => 10; }
                 [AutoConstructorParameter]
                 public int PropertySix { get; } = 10;
+                [AutoConstructorParameter]
+                public int PropertySeven
+                {
+                    get => 0;
+                    set { }
+                }
             }";
 
         string generatedCode = @"
             partial class TestClass
             {
                 public TestClass(
-                    int @fieldOne,
-                    int @fieldThree,
                     int @propertyOne,
                     int @propertyThree,
-                    int @propertyFour)
+                    int @propertyFour,
+                    int @propertySeven)
                 {
-                    this.@fieldOne = @fieldOne;
-                    this.@fieldThree = @fieldThree;
                     this.@PropertyOne = @propertyOne;
                     this.@PropertyThree = @propertyThree;
                     this.@PropertyFour = @propertyFour;
+                    this.@PropertySeven = @propertySeven;
                 }
             }";
 
@@ -291,13 +379,33 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
+    public async Task Rendering_EmptyClass()
+    {
+        string sourceCode = @"
+            [AutoConstructor]
+            partial class TestClass
+            {
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass()
+                {
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
     public async Task Rendering_ArgumentTypes()
     {
         string sourceCode = @"
             using System.Collections.Generic;
             using L = System.Collections.Generic.LinkedList<System.ApplicationException>;
 
-            [AutoConstructor(NullChecks = NullChecksSettings.Never)]
+            [AutoConstructor(NullChecks = NullChecks.Never)]
             partial class TestClass<T> where T : class
             {
                 private readonly T fieldOne;
@@ -490,7 +598,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_NonNullableReferencesOnly()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecksSettings.NonNullableReferencesOnly)]
+            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -531,7 +639,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Always()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecksSettings.Always)]
+            [AutoConstructor(NullChecks = NullChecks.Always)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -575,7 +683,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Never()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecksSettings.Never)]
+            [AutoConstructor(NullChecks = NullChecks.Never)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -611,7 +719,7 @@ public class AutoConstructorGeneratedCodeTests
     {
         string sourceCode = @"
             #nullable disable
-            [AutoConstructor(NullChecks = NullChecksSettings.NonNullableReferencesOnly)]
+            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -651,7 +759,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Generics(string constraint)
     {
         string sourceCode = $@"
-            [AutoConstructor(NullChecks = NullChecksSettings.NonNullableReferencesOnly)]
+            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly)]
             partial class TestClass<T> where T : {constraint}
             {{
                 private readonly T fieldOne;
