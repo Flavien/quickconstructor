@@ -30,7 +30,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeFields_ReadOnlyFields()
     {
         string sourceCode = @"
-            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields)]
+            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -56,7 +56,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeFields_AllFields()
     {
         string sourceCode = @"
-            [AutoConstructor(Fields = IncludeFields.AllFields)]
+            [AutoConstructor(Fields = IncludeFields.AllFields, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -84,7 +84,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeFields_AutoConstructorParameterAttribute()
     {
         string sourceCode = @"
-            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields)]
+            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields, Documentation = null)]
             partial class TestClass
             {
                 [AutoConstructorParameter]
@@ -116,7 +116,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeProperties_None()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.None)]
+            [AutoConstructor(Properties = IncludeProperties.None, Documentation = null)]
             partial class TestClass
             {
                 public int PropertyOne { get; }
@@ -147,7 +147,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeProperties_ReadOnlyProperties()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.ReadOnlyProperties)]
+            [AutoConstructor(Properties = IncludeProperties.ReadOnlyProperties, Documentation = null)]
             partial class TestClass
             {
                 public int PropertyOne { get; }
@@ -180,7 +180,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeProperties_AllProperties()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.AllProperties)]
+            [AutoConstructor(Properties = IncludeProperties.AllProperties, Documentation = null)]
             partial class TestClass
             {
                 public int PropertyOne { get; }
@@ -219,7 +219,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeProperties_AutoConstructorParameterAttribute()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.None)]
+            [AutoConstructor(Properties = IncludeProperties.None, Documentation = null)]
             partial class TestClass
             {
                 [AutoConstructorParameter]
@@ -265,7 +265,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task ParameterName_OverrideName()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass
             {
                 [AutoConstructorParameter(Name = ""modifiedField"")]
@@ -294,7 +294,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task ParameterName_ToCamelCase()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass
             {
                 private readonly string @class;
@@ -317,22 +317,22 @@ public class AutoConstructorGeneratedCodeTests
                     string @return)
                 {
                     if (@class == null)
-                        throw new System.ArgumentNullException(nameof(@class));
+                        throw new global::System.ArgumentNullException(nameof(@class));
 
                     if (@underscoreField == null)
-                        throw new System.ArgumentNullException(nameof(@underscoreField));
+                        throw new global::System.ArgumentNullException(nameof(@underscoreField));
 
                     if (@number1 == null)
-                        throw new System.ArgumentNullException(nameof(@number1));
+                        throw new global::System.ArgumentNullException(nameof(@number1));
 
                     if (@é == null)
-                        throw new System.ArgumentNullException(nameof(@é));
+                        throw new global::System.ArgumentNullException(nameof(@é));
 
                     if (@你好 == null)
-                        throw new System.ArgumentNullException(nameof(@你好));
+                        throw new global::System.ArgumentNullException(nameof(@你好));
 
                     if (@return == null)
-                        throw new System.ArgumentNullException(nameof(@return));
+                        throw new global::System.ArgumentNullException(nameof(@return));
 
                     this.@class = @class;
                     this.@_underscoreField = @underscoreField;
@@ -350,7 +350,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task ParameterName_Unchanged()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass
             {
                 private readonly string @_;
@@ -365,10 +365,10 @@ public class AutoConstructorGeneratedCodeTests
                     string @_1)
                 {
                     if (@_ == null)
-                        throw new System.ArgumentNullException(nameof(@_));
+                        throw new global::System.ArgumentNullException(nameof(@_));
 
                     if (@_1 == null)
-                        throw new System.ArgumentNullException(nameof(@_1));
+                        throw new global::System.ArgumentNullException(nameof(@_1));
 
                     this.@_ = @_;
                     this.@_1 = @_1;
@@ -382,7 +382,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task Rendering_EmptyClass()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass
             {
             }";
@@ -405,7 +405,7 @@ public class AutoConstructorGeneratedCodeTests
             using System.Collections.Generic;
             using L = System.Collections.Generic.LinkedList<System.ApplicationException>;
 
-            [AutoConstructor(NullChecks = NullChecks.Never)]
+            [AutoConstructor(NullChecks = NullChecks.Never, Documentation = null)]
             partial class TestClass<T> where T : class
             {
                 private readonly T fieldOne;
@@ -443,7 +443,7 @@ public class AutoConstructorGeneratedCodeTests
             using System.ComponentModel.DataAnnotations;
             using System.Collections.Generic;
 
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass
             {
                 [DataType(""Applicable"", ErrorMessageResourceType = typeof(List<int>))]
@@ -484,7 +484,7 @@ public class AutoConstructorGeneratedCodeTests
         string sourceCode = @"
             partial class Parent
             {
-                [AutoConstructor]
+                [AutoConstructor(Documentation = null)]
                 partial class TestClass
                 {
                     private readonly int fieldOne;
@@ -507,6 +507,32 @@ public class AutoConstructorGeneratedCodeTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
+    [Fact]
+    public async Task Rendering_Documentation()
+    {
+        string sourceCode = @"
+            [AutoConstructor(Documentation = ""This is a constructor for {0}."")]
+            partial class TestClass<T> where T : struct
+            {
+                private readonly T fieldOne;
+            }";
+
+        string generatedCode = @"
+            partial class TestClass<T>
+            {
+                /// <summary>
+                /// This is a constructor for <see cref=""global::TestNamespace.TestClass{T}"" />.
+                /// </summary>
+                public TestClass(
+                    T @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
     [Theory]
     [InlineData(Accessibility.Public, "public")]
     [InlineData(Accessibility.Protected, "protected")]
@@ -515,7 +541,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task Rendering_Accessibility(Accessibility accessibility, string keyword)
     {
         string sourceCode = $@"
-            [AutoConstructor(ConstructorAccessibility = Accessibility.{accessibility})]
+            [AutoConstructor(ConstructorAccessibility = Accessibility.{accessibility}, Documentation = null)]
             partial class TestClass
             {{
                 private readonly int fieldOne;
@@ -538,7 +564,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task SyntaxTree_Partial()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -585,6 +611,9 @@ public class AutoConstructorGeneratedCodeTests
         string generatedCode = @"
             partial class TestClass
             {
+                /// <summary>
+                /// Initializes a new instance of the <see cref=""global::TestNamespace.TestClass"" /> class.
+                /// </summary>
                 public TestClass(
                     int @fieldOne)
                 {
@@ -599,7 +628,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_NonNullableReferencesOnly()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly)]
+            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -620,10 +649,10 @@ public class AutoConstructorGeneratedCodeTests
                     global::System.Collections.Generic.List<string?> @fieldFive)
                 {
                     if (@fieldThree == null)
-                        throw new System.ArgumentNullException(nameof(@fieldThree));
+                        throw new global::System.ArgumentNullException(nameof(@fieldThree));
 
                     if (@fieldFive == null)
-                        throw new System.ArgumentNullException(nameof(@fieldFive));
+                        throw new global::System.ArgumentNullException(nameof(@fieldFive));
 
                     this.@fieldOne = @fieldOne;
                     this.@fieldTwo = @fieldTwo;
@@ -640,7 +669,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Always()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecks.Always)]
+            [AutoConstructor(NullChecks = NullChecks.Always, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -661,13 +690,13 @@ public class AutoConstructorGeneratedCodeTests
                     global::System.Collections.Generic.List<string?> @fieldFive)
                 {
                     if (@fieldThree == null)
-                        throw new System.ArgumentNullException(nameof(@fieldThree));
+                        throw new global::System.ArgumentNullException(nameof(@fieldThree));
 
                     if (@fieldFour == null)
-                        throw new System.ArgumentNullException(nameof(@fieldFour));
+                        throw new global::System.ArgumentNullException(nameof(@fieldFour));
 
                     if (@fieldFive == null)
-                        throw new System.ArgumentNullException(nameof(@fieldFive));
+                        throw new global::System.ArgumentNullException(nameof(@fieldFive));
 
                     this.@fieldOne = @fieldOne;
                     this.@fieldTwo = @fieldTwo;
@@ -684,7 +713,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Never()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecks.Never)]
+            [AutoConstructor(NullChecks = NullChecks.Never, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -720,7 +749,7 @@ public class AutoConstructorGeneratedCodeTests
     {
         string sourceCode = @"
             #nullable disable
-            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly)]
+            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -760,7 +789,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Generics(string constraint)
     {
         string sourceCode = $@"
-            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly)]
+            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
             partial class TestClass<T> where T : {constraint}
             {{
                 private readonly T fieldOne;
@@ -773,7 +802,7 @@ public class AutoConstructorGeneratedCodeTests
                     T @fieldOne)
                 {
                     if (@fieldOne == null)
-                        throw new System.ArgumentNullException(nameof(@fieldOne));
+                        throw new global::System.ArgumentNullException(nameof(@fieldOne));
 
                     this.@fieldOne = @fieldOne;
                 }

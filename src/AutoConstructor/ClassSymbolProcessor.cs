@@ -78,7 +78,8 @@ public class ClassSymbolProcessor
             _classSymbol,
             _attribute.ConstructorAccessibility,
             constructorParameters: members,
-            baseClassConstructorParameters: baseClassMembers);
+            baseClassConstructorParameters: baseClassMembers,
+            documentation: _attribute.Documentation);
     }
 
     private static IEnumerable<ConstructorParameter> GetRecursiveClassMembers(INamedTypeSymbol? classSymbol)

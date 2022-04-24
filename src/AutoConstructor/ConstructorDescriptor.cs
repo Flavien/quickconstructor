@@ -24,12 +24,14 @@ public record ConstructorDescriptor
         INamedTypeSymbol classSymbol,
         Accessibility accessibility,
         ImmutableArray<ConstructorParameter> constructorParameters,
-        ImmutableArray<ConstructorParameter> baseClassConstructorParameters)
+        ImmutableArray<ConstructorParameter> baseClassConstructorParameters,
+        string? documentation)
     {
         ClassSymbol = classSymbol;
         Accessibility = accessibility;
         ConstructorParameters = constructorParameters;
         BaseClassConstructorParameters = baseClassConstructorParameters;
+        Documentation = documentation;
     }
 
     public INamedTypeSymbol ClassSymbol { get; }
@@ -39,4 +41,6 @@ public record ConstructorDescriptor
     public ImmutableArray<ConstructorParameter> ConstructorParameters { get; }
 
     public ImmutableArray<ConstructorParameter> BaseClassConstructorParameters { get; }
+
+    public string? Documentation { get; }
 }

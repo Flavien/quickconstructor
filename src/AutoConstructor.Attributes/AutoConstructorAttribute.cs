@@ -28,4 +28,6 @@ public class AutoConstructorAttribute : Attribute
     public NullChecks NullChecks { get; set; } = NullChecks.NonNullableReferencesOnly;
 
     public Accessibility ConstructorAccessibility { get; set; } = Accessibility.Public;
+
+    public string? Documentation { get; set; } = "Initializes a new instance of the {0} class.";
 }

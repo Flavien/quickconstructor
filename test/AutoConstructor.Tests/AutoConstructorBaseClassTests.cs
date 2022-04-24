@@ -30,13 +30,13 @@ public class AutoConstructorBaseClassTests
     public async Task BaseClass_ParentWithAttribute()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass : Parent
             {
                 private readonly int fieldOne;
             }
 
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class Parent
             {
                 private readonly int parentClassField;
@@ -71,7 +71,7 @@ public class AutoConstructorBaseClassTests
     public async Task BaseClass_ParentWithDefaultConstructor()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass : System.Exception
             {
                 private readonly int fieldOne;
@@ -94,19 +94,19 @@ public class AutoConstructorBaseClassTests
     public async Task BaseClass_Grandparent()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class Grandparent
             {
                 private readonly int grandparentClassField;
             }
 
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class TestClass : Parent
             {
                 private readonly int fieldOne;
             }
 
-            [AutoConstructor]
+            [AutoConstructor(Documentation = null)]
             partial class Parent : Grandparent
             {
                 private readonly int parentClassField;

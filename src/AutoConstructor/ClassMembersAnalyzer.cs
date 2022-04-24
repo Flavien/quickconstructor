@@ -183,6 +183,6 @@ public class ClassMembersAnalyzer
         if (trimmedParameterName == string.Empty)
             return symbolName;
         else
-            return trimmedParameterName.Substring(0, 1).ToLowerInvariant() + trimmedParameterName.Substring(1);
+            return char.ToLowerInvariant(trimmedParameterName[0]) + trimmedParameterName.Substring(1);
     }
 }

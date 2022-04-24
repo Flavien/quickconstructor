@@ -14,6 +14,7 @@
 
 namespace AutoConstructor;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,7 @@ public class SourceRenderer
 
         IEnumerable<ConstructorParameter> allParameters = baseClassParameters.Concat(parameters);
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
+        string documentation = RenderDocumentation(constructorDescriptor);
         string accessibility = GetAccessModifier(constructorDescriptor.Accessibility);
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", allParameters.Select(parameter => RenderParameter(parameter)));
@@ -44,6 +46,7 @@ public class SourceRenderer
         string namespaceContents = $@"
             partial class {classDeclaration}
             {{
+                {documentation}
                 {accessibility} {classSymbol.Name}({parameterDeclarations})
                     {baseClassConstructor}
                 {{
@@ -98,7 +101,7 @@ public class SourceRenderer
 
         return @$"
             if (@{ parameter.ParameterName } == null)
-                throw new System.ArgumentNullException(nameof(@{ parameter.ParameterName }));
+                throw new global::System.ArgumentNullException(nameof(@{ parameter.ParameterName }));
         ";
     }
 
@@ -116,6 +119,27 @@ public class SourceRenderer
         IEnumerable<string> argumentList = baseClassParameters.Select(argument => "@" + argument.ParameterName);
 
         return $": base({string.Join(", ", argumentList)})";
+    }
+
+    private string RenderDocumentation(ConstructorDescriptor constructor)
+    {
+        if (constructor.Documentation == null)
+        {
+            return string.Empty;
+        }
+        else
+        {
+            string symbolName = constructor.ClassSymbol
+                .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                .Replace('<', '{')
+                .Replace('>', '}');
+            string seeTag = $"<see cref=\"{symbolName}\" />";
+
+            return $@"
+                /// <summary>
+                /// { string.Format(constructor.Documentation, seeTag) }
+                /// </summary>";
+        }
     }
 
     private string GetAccessModifier(Attributes.Accessibility accessibility)
