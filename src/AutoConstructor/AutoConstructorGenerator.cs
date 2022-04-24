@@ -105,7 +105,7 @@ public class AutoConstructorGenerator : IIncrementalGenerator
         {
             return (processor.GetConstructorDescriptor(), null);
         }
-        catch (AutoConstructorException exception)
+        catch (DiagnosticException exception)
         {
             return (null, exception.Diagnostic);
         }

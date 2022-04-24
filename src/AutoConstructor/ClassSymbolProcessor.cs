@@ -45,7 +45,7 @@ public class ClassSymbolProcessor
     {
         if (!_declarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PartialKeyword)))
         {
-            throw new AutoConstructorException(Diagnostic.Create(
+            throw new DiagnosticException(Diagnostic.Create(
                 DiagnosticDescriptors.ClassMustBePartial,
                 _declarationSyntax.Identifier.GetLocation(),
                 _classSymbol.Name));
@@ -67,7 +67,7 @@ public class ClassSymbolProcessor
 
         if (duplicates.Count > 0)
         {
-            throw new AutoConstructorException(Diagnostic.Create(
+            throw new DiagnosticException(Diagnostic.Create(
                 DiagnosticDescriptors.DuplicateConstructorParameter,
                 _declarationSyntax.Identifier.GetLocation(),
                 duplicates[0].ParameterName,

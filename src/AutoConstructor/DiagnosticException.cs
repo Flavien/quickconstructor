@@ -17,9 +17,9 @@ namespace AutoConstructor;
 using System;
 using Microsoft.CodeAnalysis;
 
-public class AutoConstructorException : Exception
+public class DiagnosticException : Exception
 {
-    public AutoConstructorException(Diagnostic diagnostic)
+    public DiagnosticException(Diagnostic diagnostic)
         : base(diagnostic.Descriptor.Title.ToString())
     {
         Diagnostic = diagnostic;

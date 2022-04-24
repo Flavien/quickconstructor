@@ -42,16 +42,16 @@ public class SourceRenderer
         string nullChecks = string.Concat(parameters.Select(parameter => RenderNullCheck(parameter)));
         string assignments = string.Concat(parameters.Select(parameter => RenderAssignment(parameter)));
         string namespaceContents = $@"
-                partial class {classDeclaration}
+            partial class {classDeclaration}
+            {{
+                {accessibility} {classSymbol.Name}({parameterDeclarations})
+                    {baseClassConstructor}
                 {{
-                    {accessibility} {classSymbol.Name}({parameterDeclarations})
-                        {baseClassConstructor}
-                    {{
-                        {nullChecks}
+                    {nullChecks}
 
-                        {assignments}
-                    }}
-                }}";
+                    {assignments}
+                }}
+            }}";
 
         INamedTypeSymbol currentSymbol = classSymbol;
         while (currentSymbol.ContainingType != null)
@@ -82,7 +82,7 @@ public class SourceRenderer
         stringBuilder.AppendLine();
 
         foreach (AttributeData attribute in parameter.Attributes)
-            stringBuilder.Append($"[{attribute}] ");
+            stringBuilder.Append($"[global::{attribute}] ");
 
         stringBuilder.Append(parameter.Type.ToDisplayString(_parameterFormat));
         stringBuilder.Append(" @");

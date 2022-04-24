@@ -441,21 +441,22 @@ public class AutoConstructorGeneratedCodeTests
     {
         string sourceCode = @"
             using System.ComponentModel.DataAnnotations;
+            using System.Collections.Generic;
 
             [AutoConstructor]
             partial class TestClass
             {
-                [Display(AutoGenerateField = true, Description = ""Applicable"")]
+                [DataType(""Applicable"", ErrorMessageResourceType = typeof(List<int>))]
                 [DisplayFormat(DataFormatString = ""Not applicable"")]
                 private readonly int fieldOne;
 
                 [AutoConstructorParameter]
-                [Display(AutoGenerateField = true, Description = ""Applicable"")]
+                [DataType(""Applicable"", ErrorMessageResourceType = typeof(List<int>))]
                 [DisplayFormat(DataFormatString = ""Not applicable"")]
                 private readonly int fieldTwo;
 
                 [AutoConstructorParameter(IncludeAttributes = false)]
-                [Display(AutoGenerateField = true, Description = ""Applicable"")]
+                [DataType(""Applicable"", ErrorMessageResourceType = typeof(List<int>))]
                 [DisplayFormat(DataFormatString = ""Not applicable"")]
                 private readonly int fieldThree;
             }";
@@ -464,8 +465,8 @@ public class AutoConstructorGeneratedCodeTests
             partial class TestClass
             {
                 public TestClass(
-                    [System.ComponentModel.DataAnnotations.DisplayAttribute(AutoGenerateField = true, Description = ""Applicable"")] int @fieldOne,
-                    [System.ComponentModel.DataAnnotations.DisplayAttribute(AutoGenerateField = true, Description = ""Applicable"")] int @fieldTwo,
+                    [global::System.ComponentModel.DataAnnotations.DataTypeAttribute(""Applicable"", ErrorMessageResourceType = typeof(System.Collections.Generic.List<int>))] int @fieldOne,
+                    [global::System.ComponentModel.DataAnnotations.DataTypeAttribute(""Applicable"", ErrorMessageResourceType = typeof(System.Collections.Generic.List<int>))] int @fieldTwo,
                     int @fieldThree)
                 {
                     this.@fieldOne = @fieldOne;
