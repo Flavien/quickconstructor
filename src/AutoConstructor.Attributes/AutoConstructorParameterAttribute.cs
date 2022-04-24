@@ -14,10 +14,14 @@
 
 namespace AutoConstructor.Attributes;
 
-public enum Accessibility
+using System;
+using System.Diagnostics;
+
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+[Conditional("INCLUDE_AUTO_CONSTRUCTOR_ATTRIBUTES")]
+public class AutoConstructorParameterAttribute : Attribute
 {
-    Public,
-    Protected,
-    Internal,
-    Private
+    public string? Name { get; set; } = null;
+
+    public bool IncludeAttributes { get; set; } = true;
 }

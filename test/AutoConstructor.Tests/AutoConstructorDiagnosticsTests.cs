@@ -15,6 +15,7 @@
 namespace AutoConstructor.Tests;
 
 using System.Threading.Tasks;
+using AutoConstructor.Attributes;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Xunit;
@@ -80,6 +81,7 @@ public class AutoConstructorDiagnosticsTests
         };
 
         tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorGenerator).Assembly);
+        tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorAttribute).Assembly);
 
         await tester.RunAsync();
     }

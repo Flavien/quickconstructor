@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AutoConstructor.Attributes\AutoConstructor.Attributes.csproj" />
     <ProjectReference Include="..\..\src\AutoConstructor\AutoConstructor.csproj" />
   </ItemGroup>
 

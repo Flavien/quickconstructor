@@ -17,6 +17,7 @@ namespace AutoConstructor.Tests;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using AutoConstructor.Attributes;
 using CSharpier;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
@@ -702,6 +703,7 @@ public class AutoConstructorGeneratedCodeTests
         };
 
         tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorGenerator).Assembly);
+        tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorAttribute).Assembly);
 
         await tester.RunAsync();
     }

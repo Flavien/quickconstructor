@@ -14,12 +14,13 @@
 
 namespace AutoConstructor.Attributes;
 
-using System;
-
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-public class AutoConstructorParameterAttribute : Attribute
+/// <summary>
+/// Represents a member accessibility level.
+/// </summary>
+public enum Accessibility
 {
-    public string? Name { get; set; } = null;
-
-    public bool IncludeAttributes { get; set; } = true;
+    Public,
+    Protected,
+    Internal,
+    Private
 }

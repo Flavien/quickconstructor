@@ -17,6 +17,7 @@ namespace AutoConstructor.Tests;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using AutoConstructor.Attributes;
 using CSharpier;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
@@ -173,6 +174,7 @@ public class AutoConstructorBaseClassTests
         };
 
         tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorGenerator).Assembly);
+        tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorAttribute).Assembly);
 
         foreach ((string name, string code) in expected)
         {

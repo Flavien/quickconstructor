@@ -15,12 +15,13 @@
 namespace AutoConstructor.Attributes;
 
 using System;
-using Microsoft.CodeAnalysis;
+using System.Diagnostics;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+[Conditional("INCLUDE_AUTO_CONSTRUCTOR_ATTRIBUTES")]
 public class AutoConstructorAttribute : Attribute
 {
-    public bool IncludeNonReadOnlyMembers { get; set; }
+    public bool IncludeNonReadOnlyMembers { get; set; } = true;
 
     public NullChecksSettings NullChecks { get; set; } = NullChecksSettings.NonNullableReferencesOnly;
 
