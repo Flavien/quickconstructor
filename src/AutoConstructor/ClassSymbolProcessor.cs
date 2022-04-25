@@ -43,14 +43,6 @@ public class ClassSymbolProcessor
 
     public ConstructorDescriptor GetConstructorDescriptor()
     {
-        if (!_declarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PartialKeyword)))
-        {
-            throw new DiagnosticException(Diagnostic.Create(
-                DiagnosticDescriptors.ClassMustBePartial,
-                _declarationSyntax.Identifier.GetLocation(),
-                _classSymbol.Name));
-        }
-
         ClassMembersAnalyzer classMembersAnalyzer = new(_classSymbol, _attribute);
         ImmutableArray<ConstructorParameter> members = classMembersAnalyzer.GetConstructorParameters();
 

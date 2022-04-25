@@ -23,22 +23,6 @@ using Xunit;
 public class AutoConstructorDiagnosticsTests
 {
     [Fact]
-    public async Task Diagnostics_ClassMustBePartial()
-    {
-        string sourceCode = @"
-            [AutoConstructor]
-            public class TestClass
-            {
-            }";
-
-        await AssertDiagnostic(
-            sourceCode,
-            new DiagnosticResult(DiagnosticDescriptors.ClassMustBePartial)
-                .WithSpan(8, 26, 8, 35)
-                .WithArguments("TestClass"));
-    }
-
-    [Fact]
     public async Task Diagnostics_DuplicateConstructorParameter()
     {
         string sourceCode = @"
