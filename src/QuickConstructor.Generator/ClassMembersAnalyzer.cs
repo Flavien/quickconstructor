@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor;
+namespace QuickConstructor.Generator;
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AutoConstructor.Attributes;
+using QuickConstructor.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -30,11 +30,11 @@ public class ClassMembersAnalyzer
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly INamedTypeSymbol _classSymbol;
-    private readonly AutoConstructorAttribute _attribute;
+    private readonly QuickConstructorAttribute _attribute;
 
     public ClassMembersAnalyzer(
         INamedTypeSymbol classSymbol,
-        AutoConstructorAttribute attribute)
+        QuickConstructorAttribute attribute)
     {
         _classSymbol = classSymbol;
         _attribute = attribute;
@@ -55,7 +55,7 @@ public class ClassMembersAnalyzer
             if (HasFieldInitializer(field))
                 continue;
 
-            AutoConstructorParameterAttribute? attribute = field.GetAttribute<AutoConstructorParameterAttribute>();
+            QuickConstructorParameterAttribute? attribute = field.GetAttribute<QuickConstructorParameterAttribute>();
 
             bool include = attribute != null || _attribute.Fields switch
             {
@@ -81,7 +81,7 @@ public class ClassMembersAnalyzer
             if (property.IsReadOnly && !IsAutoProperty(property))
                 continue;
 
-            AutoConstructorParameterAttribute? attribute = property.GetAttribute<AutoConstructorParameterAttribute>();
+            QuickConstructorParameterAttribute? attribute = property.GetAttribute<QuickConstructorParameterAttribute>();
 
             bool include = attribute != null || _attribute.Properties switch
             {
@@ -127,7 +127,7 @@ public class ClassMembersAnalyzer
     private ConstructorParameter CreateParameter(
         ISymbol member,
         ITypeSymbol type,
-        AutoConstructorParameterAttribute? parameterAttribute)
+        QuickConstructorParameterAttribute? parameterAttribute)
     {
         string parameterName;
         if (parameterAttribute?.Name == null)

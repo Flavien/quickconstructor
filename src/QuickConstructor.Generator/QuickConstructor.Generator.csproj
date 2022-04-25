@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <VersionPrefix>0.1.0</VersionPrefix>
-    <Title>AutoConstructor</Title>
-    <Description>Source generator for automatically creating constructors.</Description>
+    <Title>QuickConstructor</Title>
+    <Description>Source generator that automatically creating constructors.</Description>
     <Authors>Flavien Charlon</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -44,7 +44,7 @@
 
   <!-- Companion assembly used at compile-time -->
   <ItemGroup>
-    <ProjectReference Include="..\AutoConstructor.Attributes\AutoConstructor.Attributes.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\QuickConstructor.Attributes\QuickConstructor.Attributes.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,11 +52,11 @@
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
     <!-- Pack the attributes dll in the analyzers/dotnet/cs path -->
-    <None Include="$(OutputPath)\AutoConstructor.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\QuickConstructor.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
     <!-- Pack the attributes dll in the lib\netstandard2.0 path -->
-    <None Include="$(OutputPath)\AutoConstructor.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
-    <None Include="$(OutputPath)\AutoConstructor.Attributes.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
+    <None Include="$(OutputPath)\QuickConstructor.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
+    <None Include="$(OutputPath)\QuickConstructor.Attributes.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
   </ItemGroup>
 
 </Project>

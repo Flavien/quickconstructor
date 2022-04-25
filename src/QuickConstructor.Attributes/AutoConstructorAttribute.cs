@@ -12,16 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor.Attributes;
+namespace QuickConstructor.Attributes;
 
 using System;
 using System.Diagnostics;
 
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 [Conditional("INCLUDE_AUTO_CONSTRUCTOR_ATTRIBUTES")]
-public class AutoConstructorParameterAttribute : Attribute
+public sealed class QuickConstructorAttribute : Attribute
 {
-    public string? Name { get; set; } = null;
+    public IncludeFields Fields { get; set; } = IncludeFields.ReadOnlyFields;
 
-    public bool IncludeAttributes { get; set; } = true;
+    public IncludeProperties Properties { get; set; } = IncludeProperties.ReadOnlyProperties;
+
+    public NullChecks NullChecks { get; set; } = NullChecks.NonNullableReferencesOnly;
+
+    public Accessibility ConstructorAccessibility { get; set; } = Accessibility.Public;
+
+    public string? Documentation { get; set; } = "Initializes a new instance of the {0} class.";
 }

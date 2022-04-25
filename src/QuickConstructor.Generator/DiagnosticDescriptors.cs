@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor.Attributes;
+namespace QuickConstructor.Generator;
 
-/// <summary>
-/// Represents the accessibility level of a constructor.
-/// </summary>
-public enum Accessibility
+using Microsoft.CodeAnalysis;
+
+public class DiagnosticDescriptors
 {
-    Public,
-    Protected,
-    Internal,
-    Private
+    public static DiagnosticDescriptor DuplicateConstructorParameter { get; } = new(
+        id: "AC0001",
+        title: "Duplicate parameter name for auto-generated constructor",
+        messageFormat: "The parameter '{0}' is duplicated in the auto-generated constructor for '{1}'.",
+        category: "QuickConstructor",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }

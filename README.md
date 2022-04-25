@@ -1,1 +1,1 @@
-# AutoConstructor
+# QuickConstructor

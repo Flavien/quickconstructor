@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor;
+namespace QuickConstructor.Generator;
 
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using AutoConstructor.Attributes;
+using QuickConstructor.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,12 +27,12 @@ public class ClassSymbolProcessor
 {
     private readonly INamedTypeSymbol _classSymbol;
     private readonly ClassDeclarationSyntax _declarationSyntax;
-    private readonly AutoConstructorAttribute _attribute;
+    private readonly QuickConstructorAttribute _attribute;
 
     public ClassSymbolProcessor(
         INamedTypeSymbol classSymbol,
         ClassDeclarationSyntax declarationSyntax,
-        AutoConstructorAttribute attribute)
+        QuickConstructorAttribute attribute)
     {
         _classSymbol = classSymbol;
         _declarationSyntax = declarationSyntax;
@@ -78,7 +78,7 @@ public class ClassSymbolProcessor
     {
         if (classSymbol != null)
         {
-            AutoConstructorAttribute? attribute = classSymbol.GetAttribute<AutoConstructorAttribute>();
+            QuickConstructorAttribute? attribute = classSymbol.GetAttribute<QuickConstructorAttribute>();
             if (attribute != null)
             {
                 ClassMembersAnalyzer analyzer = new(classSymbol, attribute);

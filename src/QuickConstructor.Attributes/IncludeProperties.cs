@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor;
+namespace QuickConstructor.Attributes;
 
-using Microsoft.CodeAnalysis;
-
-public class DiagnosticDescriptors
+public enum IncludeProperties
 {
-    public static DiagnosticDescriptor DuplicateConstructorParameter { get; } = new(
-        id: "AC0001",
-        title: "Duplicate parameter name for auto-generated constructor",
-        messageFormat: "The parameter '{0}' is duplicated in the auto-generated constructor for '{1}'.",
-        category: "AutoConstructor",
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true);
+    None,
+    ReadOnlyProperties,
+    AllProperties
 }

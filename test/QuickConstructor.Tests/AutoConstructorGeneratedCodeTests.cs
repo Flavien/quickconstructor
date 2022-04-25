@@ -12,25 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor.Tests;
+namespace QuickConstructor.Tests;
 
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using AutoConstructor.Attributes;
+using QuickConstructor.Attributes;
 using CSharpier;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
-using Accessibility = AutoConstructor.Attributes.Accessibility;
+using Accessibility = QuickConstructor.Attributes.Accessibility;
+using QuickConstructor.Generator;
 
-public class AutoConstructorGeneratedCodeTests
+public class QuickConstructorGeneratedCodeTests
 {
     [Fact]
     public async Task IncludeFields_ReadOnlyFields()
     {
         string sourceCode = @"
-            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields, Documentation = null)]
+            [QuickConstructor(Fields = IncludeFields.ReadOnlyFields, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -56,7 +57,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeFields_AllFields()
     {
         string sourceCode = @"
-            [AutoConstructor(Fields = IncludeFields.AllFields, Documentation = null)]
+            [QuickConstructor(Fields = IncludeFields.AllFields, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -81,19 +82,19 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
-    public async Task IncludeFields_AutoConstructorParameterAttribute()
+    public async Task IncludeFields_QuickConstructorParameterAttribute()
     {
         string sourceCode = @"
-            [AutoConstructor(Fields = IncludeFields.ReadOnlyFields, Documentation = null)]
+            [QuickConstructor(Fields = IncludeFields.ReadOnlyFields, Documentation = null)]
             partial class TestClass
             {
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 private readonly int fieldOne;
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 private static readonly int fieldTwo;
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 private int fieldThree;
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 private readonly int fieldFour = 10;
             }";
 
@@ -116,7 +117,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeProperties_None()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.None, Documentation = null)]
+            [QuickConstructor(Properties = IncludeProperties.None, Documentation = null)]
             partial class TestClass
             {
                 public int PropertyOne { get; }
@@ -147,7 +148,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeProperties_ReadOnlyProperties()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.ReadOnlyProperties, Documentation = null)]
+            [QuickConstructor(Properties = IncludeProperties.ReadOnlyProperties, Documentation = null)]
             partial class TestClass
             {
                 public int PropertyOne { get; }
@@ -180,7 +181,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task IncludeProperties_AllProperties()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.AllProperties, Documentation = null)]
+            [QuickConstructor(Properties = IncludeProperties.AllProperties, Documentation = null)]
             partial class TestClass
             {
                 public int PropertyOne { get; }
@@ -216,25 +217,25 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Fact]
-    public async Task IncludeProperties_AutoConstructorParameterAttribute()
+    public async Task IncludeProperties_QuickConstructorParameterAttribute()
     {
         string sourceCode = @"
-            [AutoConstructor(Properties = IncludeProperties.None, Documentation = null)]
+            [QuickConstructor(Properties = IncludeProperties.None, Documentation = null)]
             partial class TestClass
             {
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 public int PropertyOne { get; }
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 public static int PropertyTwo { get; }
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 public int PropertyThree { get; set; }
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 public int PropertyFour { get; private set; }
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 public int PropertyFive { get => 10; }
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 public int PropertySix { get; } = 10;
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 public int PropertySeven
                 {
                     get => 0;
@@ -265,13 +266,13 @@ public class AutoConstructorGeneratedCodeTests
     public async Task ParameterName_OverrideName()
     {
         string sourceCode = @"
-            [AutoConstructor(Documentation = null)]
+            [QuickConstructor(Documentation = null)]
             partial class TestClass
             {
-                [AutoConstructorParameter(Name = ""modifiedField"")]
+                [QuickConstructorParameter(Name = ""modifiedField"")]
                 private readonly int fieldOne;
 
-                [AutoConstructorParameter(Name = ""@modifiedProperty"")]
+                [QuickConstructorParameter(Name = ""@modifiedProperty"")]
                 public int PropertyOne { get; }
             }";
 
@@ -294,7 +295,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task ParameterName_ToCamelCase()
     {
         string sourceCode = @"
-            [AutoConstructor(Documentation = null)]
+            [QuickConstructor(Documentation = null)]
             partial class TestClass
             {
                 private readonly string @class;
@@ -350,7 +351,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task ParameterName_Unchanged()
     {
         string sourceCode = @"
-            [AutoConstructor(Documentation = null)]
+            [QuickConstructor(Documentation = null)]
             partial class TestClass
             {
                 private readonly string @_;
@@ -382,7 +383,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task Rendering_EmptyClass()
     {
         string sourceCode = @"
-            [AutoConstructor(Documentation = null)]
+            [QuickConstructor(Documentation = null)]
             partial class TestClass
             {
             }";
@@ -405,7 +406,7 @@ public class AutoConstructorGeneratedCodeTests
             using System.Collections.Generic;
             using L = System.Collections.Generic.LinkedList<System.ApplicationException>;
 
-            [AutoConstructor(NullChecks = NullChecks.Never, Documentation = null)]
+            [QuickConstructor(NullChecks = NullChecks.Never, Documentation = null)]
             partial class TestClass<T> where T : class
             {
                 private readonly T fieldOne;
@@ -443,19 +444,19 @@ public class AutoConstructorGeneratedCodeTests
             using System.ComponentModel.DataAnnotations;
             using System.Collections.Generic;
 
-            [AutoConstructor(Documentation = null)]
+            [QuickConstructor(Documentation = null)]
             partial class TestClass
             {
                 [DataType(""Applicable"", ErrorMessageResourceType = typeof(List<int>))]
                 [DisplayFormat(DataFormatString = ""Not applicable"")]
                 private readonly int fieldOne;
 
-                [AutoConstructorParameter]
+                [QuickConstructorParameter]
                 [DataType(""Applicable"", ErrorMessageResourceType = typeof(List<int>))]
                 [DisplayFormat(DataFormatString = ""Not applicable"")]
                 private readonly int fieldTwo;
 
-                [AutoConstructorParameter(IncludeAttributes = false)]
+                [QuickConstructorParameter(IncludeAttributes = false)]
                 [DataType(""Applicable"", ErrorMessageResourceType = typeof(List<int>))]
                 [DisplayFormat(DataFormatString = ""Not applicable"")]
                 private readonly int fieldThree;
@@ -484,7 +485,7 @@ public class AutoConstructorGeneratedCodeTests
         string sourceCode = @"
             partial class Parent
             {
-                [AutoConstructor]
+                [QuickConstructor]
                 partial class TestClass
                 {
                     private readonly int fieldOne;
@@ -514,7 +515,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task Rendering_Documentation()
     {
         string sourceCode = @"
-            [AutoConstructor(Documentation = ""This is a constructor for {0}."")]
+            [QuickConstructor(Documentation = ""This is a constructor for {0}."")]
             partial class TestClass<T> where T : struct
             {
                 private readonly T fieldOne;
@@ -544,7 +545,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task Rendering_Accessibility(Accessibility accessibility, string keyword)
     {
         string sourceCode = $@"
-            [AutoConstructor(ConstructorAccessibility = Accessibility.{accessibility}, Documentation = null)]
+            [QuickConstructor(ConstructorAccessibility = Accessibility.{accessibility}, Documentation = null)]
             partial class TestClass
             {{
                 private readonly int fieldOne;
@@ -567,7 +568,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task SyntaxTree_Partial()
     {
         string sourceCode = @"
-            [AutoConstructor(Documentation = null)]
+            [QuickConstructor(Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -594,14 +595,14 @@ public class AutoConstructorGeneratedCodeTests
     }
 
     [Theory]
-    [InlineData("AutoConstructor")]
-    [InlineData("AutoConstructor()")]
-    [InlineData("AutoConstructorAttribute")]
-    [InlineData("AutoConstructor.Attributes.AutoConstructor")]
-    [InlineData("AutoConstructor.Attributes.AutoConstructorAttribute")]
-    [InlineData("global::AutoConstructor.Attributes.AutoConstructor")]
-    [InlineData("global::AutoConstructor.Attributes.AutoConstructorAttribute")]
-    [InlineData("global::AutoConstructor.Attributes.AutoConstructorAttribute()")]
+    [InlineData("QuickConstructor")]
+    [InlineData("QuickConstructor()")]
+    [InlineData("QuickConstructorAttribute")]
+    [InlineData("QuickConstructor.Attributes.QuickConstructor")]
+    [InlineData("QuickConstructor.Attributes.QuickConstructorAttribute")]
+    [InlineData("global::QuickConstructor.Attributes.QuickConstructor")]
+    [InlineData("global::QuickConstructor.Attributes.QuickConstructorAttribute")]
+    [InlineData("global::QuickConstructor.Attributes.QuickConstructorAttribute()")]
     public async Task SyntaxTree_AttributeSyntax(string attributeSyntax)
     {
         string sourceCode = $@"
@@ -631,7 +632,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_NonNullableReferencesOnly()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
+            [QuickConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -672,7 +673,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Always()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecks.Always, Documentation = null)]
+            [QuickConstructor(NullChecks = NullChecks.Always, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -716,7 +717,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Never()
     {
         string sourceCode = @"
-            [AutoConstructor(NullChecks = NullChecks.Never, Documentation = null)]
+            [QuickConstructor(NullChecks = NullChecks.Never, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -752,7 +753,7 @@ public class AutoConstructorGeneratedCodeTests
     {
         string sourceCode = @"
             #nullable disable
-            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
+            [QuickConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
             partial class TestClass
             {
                 private readonly int fieldOne;
@@ -792,7 +793,7 @@ public class AutoConstructorGeneratedCodeTests
     public async Task NullChecks_Generics(string constraint)
     {
         string sourceCode = $@"
-            [AutoConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
+            [QuickConstructor(NullChecks = NullChecks.NonNullableReferencesOnly, Documentation = null)]
             partial class TestClass<T> where T : {constraint}
             {{
                 private readonly T fieldOne;
@@ -818,7 +819,7 @@ public class AutoConstructorGeneratedCodeTests
     {
         string fullGeneratedCode = CreateExpectedFile(generatedCode);
 
-        CSharpIncrementalGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
+        CSharpIncrementalGeneratorTest<QuickConstructorGenerator, XUnitVerifier> tester = new()
         {
             TestState =
             {
@@ -826,7 +827,7 @@ public class AutoConstructorGeneratedCodeTests
                 {
                     $@"
                     #nullable enable
-                    using AutoConstructor.Attributes;
+                    using QuickConstructor.Attributes;
                     namespace TestNamespace
                     {{
                         {sourceCode}
@@ -835,7 +836,7 @@ public class AutoConstructorGeneratedCodeTests
                 GeneratedSources =
                 {
                     (
-                        typeof(AutoConstructorGenerator),
+                        typeof(QuickConstructorGenerator),
                         $"TestClass.cs",
                         SourceText.From(fullGeneratedCode, Encoding.UTF8)
                     ),
@@ -843,8 +844,8 @@ public class AutoConstructorGeneratedCodeTests
             },
         };
 
-        tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorGenerator).Assembly);
-        tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorAttribute).Assembly);
+        tester.TestState.AdditionalReferences.Add(typeof(QuickConstructorGenerator).Assembly);
+        tester.TestState.AdditionalReferences.Add(typeof(QuickConstructorAttribute).Assembly);
 
         await tester.RunAsync();
     }
@@ -853,7 +854,7 @@ public class AutoConstructorGeneratedCodeTests
     {
         string fullGeneratedCode = $@"
             /// <auto-generated>
-            ///   This code was generated by the {nameof(AutoConstructor)} source generator.
+            ///   This code was generated by the {nameof(QuickConstructor)} source generator.
             /// </auto-generated>
 
             #nullable enable

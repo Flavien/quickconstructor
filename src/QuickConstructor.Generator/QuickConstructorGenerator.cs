@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor;
+namespace QuickConstructor.Generator;
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using AutoConstructor.Attributes;
+using QuickConstructor.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 [Generator(LanguageNames.CSharp)]
-public class AutoConstructorGenerator : IIncrementalGenerator
+public class QuickConstructorGenerator : IIncrementalGenerator
 {
-    private static readonly Regex _attributeSyntaxRegex = new("AutoConstructor(Attribute)?$", RegexOptions.Compiled);
+    private static readonly Regex _attributeSyntaxRegex = new("QuickConstructor(Attribute)?$", RegexOptions.Compiled);
 
     private readonly SourceRenderer _sourceRenderer = new();
 
@@ -86,7 +86,7 @@ public class AutoConstructorGenerator : IIncrementalGenerator
         if (symbol is not INamedTypeSymbol classSymbol)
             return null;
 
-        AutoConstructorAttribute? attribute = symbol.GetAttribute<AutoConstructorAttribute>();
+        QuickConstructorAttribute? attribute = symbol.GetAttribute<QuickConstructorAttribute>();
 
         if (attribute == null)
             return null;

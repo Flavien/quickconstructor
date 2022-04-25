@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\AutoConstructor.Attributes\AutoConstructor.Attributes.csproj" />
-    <ProjectReference Include="..\..\src\AutoConstructor\AutoConstructor.csproj" />
+    <ProjectReference Include="..\..\src\QuickConstructor.Attributes\QuickConstructor.Attributes.csproj" />
+    <ProjectReference Include="..\..\src\QuickConstructor.Generator\QuickConstructor.Generator.csproj" />
   </ItemGroup>
 
 </Project>

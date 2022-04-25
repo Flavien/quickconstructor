@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor.Tests;
+namespace QuickConstructor.Tests;
 
 using System.Collections.Generic;
 using System.Collections.Immutable;

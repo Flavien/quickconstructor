@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor.Attributes;
+namespace QuickConstructor.Attributes;
 
-public enum IncludeProperties
+public enum NullChecks
 {
-    None,
-    ReadOnlyProperties,
-    AllProperties
+    Always,
+    Never,
+    NonNullableReferencesOnly
 }

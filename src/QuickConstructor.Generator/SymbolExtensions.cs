@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor;
+namespace QuickConstructor.Generator;
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
-internal static class AutoConstructorExtensions
+internal static class QuickConstructorExtensions
 {
     public static T? GetAttribute<T>(this ISymbol symbol)
         where T : Attribute

@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor.Attributes;
+namespace QuickConstructor.Attributes;
 
-public enum NullChecks
+/// <summary>
+/// Represents the accessibility level of a constructor.
+/// </summary>
+public enum Accessibility
 {
-    Always,
-    Never,
-    NonNullableReferencesOnly
+    Public,
+    Protected,
+    Internal,
+    Private
 }

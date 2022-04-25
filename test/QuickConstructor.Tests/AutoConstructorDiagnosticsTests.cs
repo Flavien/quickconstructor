@@ -12,21 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace AutoConstructor.Tests;
+namespace QuickConstructor.Tests;
 
 using System.Threading.Tasks;
-using AutoConstructor.Attributes;
+using QuickConstructor.Attributes;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Xunit;
+using QuickConstructor.Generator;
 
-public class AutoConstructorDiagnosticsTests
+public class QuickConstructorDiagnosticsTests
 {
     [Fact]
     public async Task Diagnostics_DuplicateConstructorParameter()
     {
         string sourceCode = @"
-            [AutoConstructor]
+            [QuickConstructor]
             partial class TestClass
             {
                 private readonly int value;
@@ -42,7 +43,7 @@ public class AutoConstructorDiagnosticsTests
 
     private static async Task AssertDiagnostic(string sourceCode, DiagnosticResult diagnostic)
     {
-        CSharpIncrementalGeneratorTest<AutoConstructorGenerator, XUnitVerifier> tester = new()
+        CSharpIncrementalGeneratorTest<QuickConstructorGenerator, XUnitVerifier> tester = new()
         {
             TestState =
             {
@@ -50,7 +51,7 @@ public class AutoConstructorDiagnosticsTests
                 {
                     $@"
                     #nullable enable
-                    using AutoConstructor.Attributes;
+                    using QuickConstructor.Attributes;
                     namespace TestNamespace
                     {{
                         {sourceCode}
@@ -64,8 +65,8 @@ public class AutoConstructorDiagnosticsTests
             },
         };
 
-        tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorGenerator).Assembly);
-        tester.TestState.AdditionalReferences.Add(typeof(AutoConstructorAttribute).Assembly);
+        tester.TestState.AdditionalReferences.Add(typeof(QuickConstructorGenerator).Assembly);
+        tester.TestState.AdditionalReferences.Add(typeof(QuickConstructorAttribute).Assembly);
 
         await tester.RunAsync();
     }
