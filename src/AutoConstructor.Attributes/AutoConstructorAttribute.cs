@@ -19,7 +19,7 @@ using System.Diagnostics;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 [Conditional("INCLUDE_AUTO_CONSTRUCTOR_ATTRIBUTES")]
-public class AutoConstructorAttribute : Attribute
+public sealed class AutoConstructorAttribute : Attribute
 {
     public IncludeFields Fields { get; set; } = IncludeFields.ReadOnlyFields;
 
