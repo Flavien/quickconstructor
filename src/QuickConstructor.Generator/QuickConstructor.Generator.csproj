@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionPrefix>0.1.1</VersionPrefix>
+    <PackageId>QuickConstructor</PackageId>
     <Title>QuickConstructor</Title>
-    <Description>Source generator that automatically creating constructors.</Description>
+    <Description>Source generator that automatically creates a constructor from the fields and properties of a class.</Description>
     <Authors>Flavien Charlon</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -46,6 +47,9 @@
   <ItemGroup>
     <ProjectReference Include="..\QuickConstructor.Attributes\QuickConstructor.Attributes.csproj" PrivateAssets="All" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="bin\Release\netstandard2.0\\QuickConstructor.Generator.dll" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Pack the generator dll in the analyzers/dotnet/cs path -->
@@ -53,10 +57,11 @@
 
     <!-- Pack the attributes dll in the analyzers/dotnet/cs path -->
     <None Include="$(OutputPath)\QuickConstructor.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PKGCSharpier_Core)\lib\netstandard2.0\CSharpier.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
     <!-- Pack the attributes dll in the lib\netstandard2.0 path -->
-    <None Include="$(OutputPath)\QuickConstructor.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
-    <None Include="$(OutputPath)\QuickConstructor.Attributes.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
+    <None Include="$(OutputPath)\QuickConstructor.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
+    <None Include="$(OutputPath)\QuickConstructor.Attributes.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
   </ItemGroup>
 
 </Project>
