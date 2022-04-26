@@ -170,11 +170,11 @@ public class ClassMembersAnalyzer
             nullCheck = false;
 
         return new ConstructorParameter(
-                symbol: member,
-                type: type,
-                parameterName: parameterName,
-                nullCheck: nullCheck,
-                attributes: ImmutableArray.CreateRange(attributeData));
+            symbol: member,
+            type: type,
+            parameterName: parameterName,
+            nullCheck: nullCheck,
+            attributes: ImmutableArray.CreateRange(attributeData));
     }
 
     private static string GetParameterName(string symbolName)

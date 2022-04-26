@@ -14,16 +14,14 @@
 
 namespace QuickConstructor.Tests;
 
-using System;
 using System.Text;
 using System.Threading.Tasks;
-using QuickConstructor.Attributes;
 using CSharpier;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.Text;
-using Xunit;
+using QuickConstructor.Attributes;
 using QuickConstructor.Generator;
+using Xunit;
 
 public class QuickConstructorBaseClassTests
 {
