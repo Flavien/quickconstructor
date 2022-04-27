@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>0.1.1</VersionPrefix>
     <PackageId>QuickConstructor</PackageId>
+    <VersionPrefix>0.1.2</VersionPrefix>
     <Title>QuickConstructor</Title>
     <Description>Source generator that automatically creates a constructor from the fields and properties of a class.</Description>
     <Authors>Flavien Charlon</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/flavien/QuickConstructor</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Copyright>Copyright © 2022 Flavien Charlon</Copyright>
   </PropertyGroup>
