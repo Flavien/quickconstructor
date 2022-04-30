@@ -14,9 +14,22 @@
 
 namespace QuickConstructor.Attributes;
 
+/// <summary>
+/// Represents a strategy for emitting null checks in an automatically generated constructor.
+/// </summary>
 public enum NullChecks
 {
+    /// <summary>
+    /// Null checks are generated for any field or property whose type is a reference type.
+    /// </summary>
     Always,
+    /// <summary>
+    /// Null checks are not generated for this constructor.
+    /// </summary>
     Never,
+    /// <summary>
+    /// When null-state analysis is enabled (C# 8.0 and later), a null check will be generated only if a type is
+    /// marked as non-nullable. When null-state analysis is disabled, no null check is generated.
+    /// </summary>
     NonNullableReferencesOnly
 }

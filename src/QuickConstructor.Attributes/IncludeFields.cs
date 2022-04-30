@@ -14,8 +14,17 @@
 
 namespace QuickConstructor.Attributes;
 
+/// <summary>
+/// Represents a strategy for selecting which fields are initialized in an automatically generated constructor.
+/// </summary>
 public enum IncludeFields
 {
+    /// <summary>
+    /// Only read-only fields are initialized in the constructor.
+    /// </summary>
     ReadOnlyFields,
+    /// <summary>
+    /// All fields are initialized in the constructor.
+    /// </summary>
     AllFields
 }

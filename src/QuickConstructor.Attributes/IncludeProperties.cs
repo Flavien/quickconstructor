@@ -14,9 +14,21 @@
 
 namespace QuickConstructor.Attributes;
 
+/// <summary>
+/// Represents a strategy for selecting which properties are initialized in an automatically generated constructor.
+/// </summary>
 public enum IncludeProperties
 {
+    /// <summary>
+    /// No property is initialized in the constructor.
+    /// </summary>
     None,
+    /// <summary>
+    /// Only read-only auto-implemented properties are initialized in the constructor.
+    /// </summary>
     ReadOnlyProperties,
+    /// <summary>
+    /// All settable properties are initialized in the constructor.
+    /// </summary>
     AllProperties
 }

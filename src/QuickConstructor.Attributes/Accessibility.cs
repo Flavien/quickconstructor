@@ -19,8 +19,20 @@ namespace QuickConstructor.Attributes;
 /// </summary>
 public enum Accessibility
 {
+    /// <summary>
+    /// The constructor is public.
+    /// </summary>
     Public,
+    /// <summary>
+    /// The constructor is protected.
+    /// </summary>
     Protected,
+    /// <summary>
+    /// The constructor is internal.
+    /// </summary>
     Internal,
+    /// <summary>
+    /// The constructor is private.
+    /// </summary>
     Private
 }

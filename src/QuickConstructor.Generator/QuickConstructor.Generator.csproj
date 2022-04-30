@@ -36,7 +36,7 @@
 
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGCSharpier_Core)\lib\netstandard2.0\CSharpier.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGCSharpier_Core)/lib/netstandard2.0/CSharpier.dll" IncludeRuntimeDependency="false" />
     </ItemGroup>
   </Target>
 
@@ -46,23 +46,18 @@
 
   <!-- Companion assembly used at compile-time -->
   <ItemGroup>
-    <ProjectReference Include="..\QuickConstructor.Attributes\QuickConstructor.Attributes.csproj" PrivateAssets="All" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="bin\Release\netstandard2.0\\QuickConstructor.Generator.dll" />
+    <ProjectReference Include="../QuickConstructor.Attributes/QuickConstructor.Attributes.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Pack the generator dll in the analyzers/dotnet/cs path -->
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!-- Pack the generator dll and dependencies in the analyzers/dotnet/cs path -->
+    <None Include="$(OutputPath)/$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)/QuickConstructor.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(PKGCSharpier_Core)/lib/netstandard2.0/CSharpier.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
-    <!-- Pack the attributes dll in the analyzers/dotnet/cs path -->
-    <None Include="$(OutputPath)\QuickConstructor.Attributes.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(PKGCSharpier_Core)\lib\netstandard2.0\CSharpier.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-
-    <!-- Pack the attributes dll in the lib\netstandard2.0 path -->
-    <None Include="$(OutputPath)\QuickConstructor.Attributes.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
-    <None Include="$(OutputPath)\QuickConstructor.Attributes.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="false" />
+    <!-- Pack the attributes dll in the lib/netstandard2.0 path -->
+    <None Include="$(OutputPath)/QuickConstructor.Attributes.dll" Pack="true" PackagePath="lib/netstandard2.0" Visible="false" />
+    <None Include="$(OutputPath)/QuickConstructor.Attributes.xml" Pack="true" PackagePath="lib/netstandard2.0" Visible="false" />
   </ItemGroup>
 
 </Project>

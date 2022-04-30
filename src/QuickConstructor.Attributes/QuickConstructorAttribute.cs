@@ -17,17 +17,35 @@ namespace QuickConstructor.Attributes;
 using System;
 using System.Diagnostics;
 
+/// <summary>
+/// Specifies that a constructor should be automatically generated.
+/// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 [Conditional("INCLUDE_AUTO_CONSTRUCTOR_ATTRIBUTES")]
 public sealed class QuickConstructorAttribute : Attribute
 {
+    /// <summary>
+    /// Gets or sets a value indicating which fields should be initialized in the constructor.
+    /// </summary>
     public IncludeFields Fields { get; set; } = IncludeFields.ReadOnlyFields;
 
+    /// <summary>
+    /// Gets or sets a value indicating which properties should be initialized in the constructor.
+    /// </summary>
     public IncludeProperties Properties { get; set; } = IncludeProperties.ReadOnlyProperties;
 
+    /// <summary>
+    /// Gets or sets a value indicating how null checks should be emitted for the constructor parameters.
+    /// </summary>
     public NullChecks NullChecks { get; set; } = NullChecks.NonNullableReferencesOnly;
 
+    /// <summary>
+    /// Gets or sets a value indicating which accessibility the constructor should have.
+    /// </summary>
     public Accessibility ConstructorAccessibility { get; set; } = Accessibility.Public;
 
+    /// <summary>
+    /// Gets or sets the summary text used when emitting XML documentation for the constructor.
+    /// </summary>
     public string? Documentation { get; set; } = "Initializes a new instance of the {0} class.";
 }
