@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <PackageId>QuickConstructor</PackageId>
-    <VersionPrefix>0.1.2</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Title>QuickConstructor</Title>
-    <Description>Source generator that automatically creates a constructor from the fields and properties of a class.</Description>
+    <Description>Source generator that automatically emits a constructor from the fields and properties of a class.</Description>
     <Authors>Flavien Charlon</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/flavien/QuickConstructor</PackageProjectUrl>

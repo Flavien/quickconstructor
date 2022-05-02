@@ -10,7 +10,7 @@ QuickConstructor is a source generator that automatically creates a constructor 
 - Customize which fields and properties are initialized in the constructor.
 - Generate null checks automatically based on nullable annotations.
 - Works with nested classes and generic classes.
-- Easily place attributes on the parameters of the generated constructor.
+- Ability to place attributes on the parameters of the generated constructor.
 - No traces left after compilation, no runtime reference necessary.
 - Generate XML documentation automatically for the constructor.
 - Lightning fast thanks to the .NET 6.0 incremental source generator system.
@@ -53,7 +53,7 @@ public class Car
 }
 ```
 
-The constructor is automatically generated.
+The constructor is automatically generated from the field definitions.
 
 ## Installation
 
@@ -70,7 +70,7 @@ dotnet add package QuickConstructor
 
 ## Usage
 
-QuickConstructor is very easy to use. By simply decorating a class with the `[QuickConstructor]` attribute, the source generator will automatically create a constructor based on fields and properties declared in the class. The constructor will automatically update to reflect any change made to the class.
+QuickConstructor is very easy to use. By simply decorating a class with the `[QuickConstructor]` attribute and making the class `partial`, the source generator will automatically create a constructor based on fields and properties declared in the class. The constructor will automatically update to reflect any change made to the class.
 
 QuickConstructor offers options to customize various aspects of the constructors being generated.
 
@@ -80,8 +80,8 @@ Quick constructors will always initialize read-only fields as the constructor wo
 
 | Value                          | Description |
 | ------------------------------ | ----------- |
-| `IncludeFields.ReadOnlyFields` | **(default)** Only read-only fields are included in the constructor. |
-| `IncludeFields.AllFields` | All fields are included in the constructor. |
+| `IncludeFields.ReadOnlyFields` | **(default)** Only read-only fields are initialized in the constructor. |
+| `IncludeFields.AllFields` | All fields are initialized in the constructor. |
 
 Fields with an initializer are never included as part of the constructor.
 
@@ -92,8 +92,8 @@ It is possible to control which property is initialized in the constructor via t
 | Value                    | Description |
 | ------------------------ | ----------- |
 | `IncludeProperties.None` | No property is initialized in the constructor. |
-| `IncludeProperties.ReadOnlyProperties` | **(default)** Only read-only auto-implemented properties are included in the constructor. |
-| `IncludeProperties.AllProperties` | All settable properties are included in the constructor. |
+| `IncludeProperties.ReadOnlyProperties` | **(default)** Only read-only auto-implemented properties are initialized in the constructor. |
+| `IncludeProperties.AllProperties` | All settable properties are initialized in the constructor. |
 
 Properties with an initializer are never included as part of the constructor.
 
@@ -103,9 +103,63 @@ QuickConstructor has the ability to generate null checks for reference parameter
 
 | Value               | Description |
 | ------------------- | ----------- |
-| `NullChecks.Always` | Null checks are generated for any included field or property whose type is a reference type. |
+| `NullChecks.Always` | Null checks are generated for any field or property whose type is a reference type. |
 | `NullChecks.Never` | Null checks are not generated for this constructor. |
-| `NullChecks.NonNullableReferencesOnly` | **(default)** When null-state analysis is enabled (from C# 8.0), a null check will be generated if a type is marked as non-nullable. Otherwise no null check is generated for this parameter. |
+| `NullChecks.NonNullableReferencesOnly` | **(default)** When null-state analysis is enabled (C# 8.0 and later), a null check will be generated only if a type is marked as non-nullable. When null-state analysis is disabled, no null check is generated. |
+
+### Explicitely include a field or property
+
+It is possible to explicitely include a field or property by decorating it with the `[QuickConstructorParameter]`.
+
+For example:
+
+```csharp
+[QuickConstructor]
+public partial class Vehicle
+{
+    [QuickConstructorParameter]
+    private int _mileage;
+
+    private int _speed;
+}
+```
+
+will result in this constructor:
+
+```csharp
+public Vehicle(int mileage)
+{
+    this._mileage = mileage;
+}
+```
+
+While both `_mileage` and `_speed` are mutable fields, only `_mileage` gets initialized in the constructor because it is decorated with `[QuickConstructorParameter]`.
+
+### Overriding the name of a parameter
+
+It is possible to override the name of a parameter in the constructor using the `Name` property of the `[QuickConstructorParameter]` attribute.
+
+This class:
+
+```csharp
+[QuickConstructor]
+public partial class Vehicle
+{
+    [QuickConstructorParameter(Name = "startingMileage")]
+    private int _mileage;
+
+    private int _speed;
+}
+```
+
+will result in this constructor:
+
+```csharp
+public Vehicle(int startingMileage)
+{
+    this._mileage = startingMileage;
+}
+```
 
 ### Constructor accessibility
 

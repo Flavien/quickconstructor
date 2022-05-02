@@ -297,28 +297,21 @@ public class QuickConstructorGeneratedCodeTests
             [QuickConstructor(Documentation = null)]
             partial class TestClass
             {
-                private readonly string @class;
                 private readonly string _underscoreField;
                 private readonly string number1;
                 private readonly string É;
                 private readonly string 你好;
-                public string Return { get; }
             }";
 
         string generatedCode = @"
             partial class TestClass
             {
                 public TestClass(
-                    string @class,
                     string @underscoreField,
                     string @number1,
                     string @é,
-                    string @你好,
-                    string @return)
+                    string @你好)
                 {
-                    if (@class == null)
-                        throw new global::System.ArgumentNullException(nameof(@class));
-
                     if (@underscoreField == null)
                         throw new global::System.ArgumentNullException(nameof(@underscoreField));
 
@@ -331,14 +324,41 @@ public class QuickConstructorGeneratedCodeTests
                     if (@你好 == null)
                         throw new global::System.ArgumentNullException(nameof(@你好));
 
-                    if (@return == null)
-                        throw new global::System.ArgumentNullException(nameof(@return));
-
-                    this.@class = @class;
                     this.@_underscoreField = @underscoreField;
                     this.@number1 = @number1;
                     this.@É = @é;
                     this.@你好 = @你好;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task ParameterName_ReservedKeyword()
+    {
+        string sourceCode = @"
+            [QuickConstructor(Documentation = null)]
+            partial class TestClass
+            {
+                private readonly string @class;
+                public string Return { get; }
+            }";
+
+        string generatedCode = @"
+            partial class TestClass
+            {
+                public TestClass(
+                    string @class,
+                    string @return)
+                {
+                    if (@class == null)
+                        throw new global::System.ArgumentNullException(nameof(@class));
+
+                    if (@return == null)
+                        throw new global::System.ArgumentNullException(nameof(@return));
+
+                    this.@class = @class;
                     this.@Return = @return;
                 }
             }";
