@@ -1,7 +1,7 @@
 # QuickConstructor
 [![QuickConstructor](https://img.shields.io/nuget/v/QuickConstructor.svg?style=flat-square&color=blue&logo=nuget)](https://www.nuget.org/packages/QuickConstructor/)
 
-QuickConstructor is a source generator that automatically creates a constructor from the fields and properties of a class.
+QuickConstructor is a reliable and feature-rich source generator that can automatically emit a constructor from the fields and properties of a class. 
 
 ## Features
 
@@ -10,6 +10,7 @@ QuickConstructor is a source generator that automatically creates a constructor 
 - Customize which fields and properties are initialized in the constructor.
 - Generate null checks automatically based on nullable annotations.
 - Works with nested classes and generic classes.
+- Support derived classes.
 - Ability to place attributes on the parameters of the generated constructor.
 - No traces left after compilation, no runtime reference necessary.
 - Generate XML documentation automatically for the constructor.
@@ -43,7 +44,7 @@ With QuickConstructor, this becomes:
 
 ```csharp
 [QuickConstructor]
-public class Car
+public partial class Car
 {
     private readonly string _registration;
     private readonly string _model;
@@ -158,6 +159,37 @@ will result in this constructor:
 public Vehicle(int startingMileage)
 {
     this._mileage = startingMileage;
+}
+```
+
+### Derived classes
+
+It is possible to generate a constructor for a class inheriting from a base class, however the base class must either itself be decorated with `[QuickConstructor]`, or it must have a parameterless constructor.
+
+For example:
+
+```csharp
+[QuickConstructor(Fields = IncludeFields.AllFields)]
+public partial class Vehicle
+{
+    private int _mileage;
+    private int _speed;
+}
+
+[QuickConstructor]
+public partial class Bus : Vehicle
+{
+    private readonly int _capacity;
+}
+```
+
+In that situation, a constructor will be generated for the `Bus` class, with the following implementation:
+
+```csharp
+public Bus(int mileage, int speed, int capacity)
+    : base(mileage, speed)
+{
+    this._capacity = capacity;
 }
 ```
 

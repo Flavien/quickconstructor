@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>QuickConstructor</PackageId>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.0.1</VersionPrefix>
     <Title>QuickConstructor</Title>
     <Description>Source generator that automatically emits a constructor from the fields and properties of a class.</Description>
     <Authors>Flavien Charlon</Authors>
