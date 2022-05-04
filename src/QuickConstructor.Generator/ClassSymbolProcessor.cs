@@ -42,11 +42,11 @@ public class ClassSymbolProcessor
 
     public ConstructorDescriptor GetConstructorDescriptor()
     {
-        ClassMembersAnalyzer classMembersAnalyzer = new(_classSymbol, _attribute);
+        ClassMembersAnalyzer classMembersAnalyzer = new(_classSymbol, _declarationSyntax, _attribute);
         ImmutableArray<ConstructorParameter> members = classMembersAnalyzer.GetConstructorParameters();
 
         ImmutableArray<ConstructorParameter> baseClassMembers = ImmutableArray
-            .CreateRange(GetRecursiveClassMembers(_classSymbol.BaseType));
+            .CreateRange(GetRecursiveClassMembers(_classSymbol.BaseType, _declarationSyntax));
 
         ILookup<string, ConstructorParameter> lookup = members
             .ToLookup(member => member.ParameterName, StringComparer.Ordinal);
@@ -73,17 +73,19 @@ public class ClassSymbolProcessor
             documentation: _attribute.Documentation);
     }
 
-    private static IEnumerable<ConstructorParameter> GetRecursiveClassMembers(INamedTypeSymbol? classSymbol)
+    private static IEnumerable<ConstructorParameter> GetRecursiveClassMembers(
+        INamedTypeSymbol? classSymbol,
+        ClassDeclarationSyntax declarationSyntax)
     {
         if (classSymbol != null)
         {
             QuickConstructorAttribute? attribute = classSymbol.GetAttribute<QuickConstructorAttribute>();
             if (attribute != null)
             {
-                ClassMembersAnalyzer analyzer = new(classSymbol, attribute);
+                ClassMembersAnalyzer analyzer = new(classSymbol, declarationSyntax, attribute);
                 IReadOnlyList<ConstructorParameter> parameters = analyzer.GetConstructorParameters();
 
-                return GetRecursiveClassMembers(classSymbol.BaseType).Concat(parameters);
+                return GetRecursiveClassMembers(classSymbol.BaseType, declarationSyntax).Concat(parameters);
             }
         }
 

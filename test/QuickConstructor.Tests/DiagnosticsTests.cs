@@ -15,13 +15,13 @@
 namespace QuickConstructor.Tests;
 
 using System.Threading.Tasks;
-using QuickConstructor.Attributes;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
-using Xunit;
+using QuickConstructor.Attributes;
 using QuickConstructor.Generator;
+using Xunit;
 
-public class QuickConstructorDiagnosticsTests
+public class DiagnosticsTests
 {
     [Fact]
     public async Task Diagnostics_DuplicateConstructorParameter()
@@ -39,6 +39,29 @@ public class QuickConstructorDiagnosticsTests
             new DiagnosticResult(DiagnosticDescriptors.DuplicateConstructorParameter)
                 .WithSpan(8, 27, 8, 36)
                 .WithArguments("value", "TestClass"));
+    }
+
+    [Theory]
+    [InlineData("1value")]
+    [InlineData("a$")]
+    [InlineData("!a")]
+    [InlineData("")]
+    [InlineData("with space")]
+    public async Task Diagnostics_InvalidParameterName(string name)
+    {
+        string sourceCode = $@"
+            [QuickConstructor]
+            partial class TestClass
+            {{
+                [QuickConstructorParameter(Name = ""{name}"")]
+                private readonly int value;
+            }}";
+
+        await AssertDiagnostic(
+            sourceCode,
+            new DiagnosticResult(DiagnosticDescriptors.InvalidParameterName)
+                .WithSpan(8, 27, 8, 36)
+                .WithArguments(name, "TestClass"));
     }
 
     private static async Task AssertDiagnostic(string sourceCode, DiagnosticResult diagnostic)

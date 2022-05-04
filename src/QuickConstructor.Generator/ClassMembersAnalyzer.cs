@@ -19,9 +19,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
-using QuickConstructor.Attributes;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using QuickConstructor.Attributes;
 
 public class ClassMembersAnalyzer
 {
@@ -30,13 +31,16 @@ public class ClassMembersAnalyzer
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly INamedTypeSymbol _classSymbol;
+    private readonly ClassDeclarationSyntax _declarationSyntax;
     private readonly QuickConstructorAttribute _attribute;
 
     public ClassMembersAnalyzer(
         INamedTypeSymbol classSymbol,
+        ClassDeclarationSyntax declarationSyntax,
         QuickConstructorAttribute attribute)
     {
         _classSymbol = classSymbol;
+        _declarationSyntax = declarationSyntax;
         _attribute = attribute;
     }
 
@@ -134,6 +138,15 @@ public class ClassMembersAnalyzer
             parameterName = GetParameterName(member.Name);
         else
             parameterName = parameterAttribute.Name.TrimStart('@');
+
+        if (!SyntaxFacts.IsValidIdentifier(parameterName))
+        {
+            throw new DiagnosticException(Diagnostic.Create(
+                DiagnosticDescriptors.InvalidParameterName,
+                _declarationSyntax.Identifier.GetLocation(),
+                parameterName,
+                _classSymbol.Name));
+        }
 
         List<AttributeData> attributeData = new();
         if (parameterAttribute?.IncludeAttributes != false)

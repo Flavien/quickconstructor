@@ -25,4 +25,12 @@ public class DiagnosticDescriptors
         category: "QuickConstructor",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
+
+    public static DiagnosticDescriptor InvalidParameterName { get; } = new(
+        id: "AC0002",
+        title: "Invalid parameter name",
+        messageFormat: "The parameter name '{0}' in class '{1}' is not a valid identifier.",
+        category: "QuickConstructor",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }
