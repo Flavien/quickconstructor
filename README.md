@@ -108,6 +108,35 @@ QuickConstructor has the ability to generate null checks for reference parameter
 | `NullChecks.Never` | Null checks are not generated for this constructor. |
 | `NullChecks.NonNullableReferencesOnly` | **(default)** When null-state analysis is enabled (C# 8.0 and later), a null check will be generated only if a type is marked as non-nullable. When null-state analysis is disabled, no null check is generated. |
 
+For example, with null-state analysis enabled:
+
+```csharp
+[QuickConstructor]
+public partial class Name
+{
+    private readonly string _firstName;
+    private readonly string? _middleName;
+    private readonly string _lastName;
+}
+```
+
+This code will result in the following constructor being generated:
+
+```csharp
+public Name(string firstName, string? middleName, string lastName)
+{
+    if (firstName == null)
+        throw new ArgumentNullException(nameof(firstName));
+
+    if (lastName == null)
+        throw new ArgumentNullException(nameof(lastName));
+
+    this._firstName = firstName;
+    this._middleName = middleName;
+    this._lastName = lastName;
+}
+```
+
 ### Explicitely include a field or property
 
 It is possible to explicitely include a field or property by decorating it with the `[QuickConstructorParameter]`.
@@ -134,7 +163,7 @@ public Vehicle(int mileage)
 }
 ```
 
-While both `_mileage` and `_speed` are mutable fields, only `_mileage` gets initialized in the constructor because it is decorated with `[QuickConstructorParameter]`.
+While both `_mileage` and `_speed` are mutable fields, and therefore are exluded by default, `_mileage` does get initialized in the constructor because it is decorated with `[QuickConstructorParameter]`.
 
 ### Overriding the name of a parameter
 
