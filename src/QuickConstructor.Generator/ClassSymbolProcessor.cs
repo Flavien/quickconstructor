@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using QuickConstructor.Attributes;
 
@@ -65,10 +66,17 @@ public class ClassSymbolProcessor
                 _classSymbol.Name));
         }
 
+        SyntaxTokenList declarationKeywords = new(_declarationSyntax.Keyword);
+        if (_declarationSyntax is RecordDeclarationSyntax recordDeclarationSyntax)
+        {
+            if (!recordDeclarationSyntax.ClassOrStructKeyword.IsKind(SyntaxKind.None))
+                declarationKeywords = declarationKeywords.Add(recordDeclarationSyntax.ClassOrStructKeyword);
+        }
+
         return new ConstructorDescriptor(
             classSymbol: _classSymbol,
             accessibility: _attribute.ConstructorAccessibility,
-            declarationKeyword: _declarationSyntax.Keyword,
+            declarationKeywords: declarationKeywords,
             constructorParameters: members,
             baseClassConstructorParameters: baseClassMembers,
             documentation: _attribute.Documentation);

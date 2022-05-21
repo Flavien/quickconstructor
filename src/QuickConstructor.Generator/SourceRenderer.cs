@@ -38,7 +38,8 @@ public class SourceRenderer
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
         string documentation = RenderDocumentation(constructorDescriptor);
         string accessibility = GetAccessModifier(constructorDescriptor.Accessibility);
-        string declarationKeyword = constructorDescriptor.DeclarationKeyword.ToFullString();
+        string readonlyKeyword = constructorDescriptor.IsReadOnly ? "readonly" : "";
+        string declarationKeywords = constructorDescriptor.DeclarationKeywords.ToFullString();
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", allParameters.Select(parameter => RenderParameter(parameter)));
         string baseClassConstructor = CreateBaseClassConstructor(baseClassParameters);
@@ -46,7 +47,7 @@ public class SourceRenderer
         string assignments = string.Concat(parameters.Select(parameter => RenderAssignment(parameter)));
         
         string namespaceContents = $@"
-            partial {declarationKeyword} {classDeclaration}
+            {readonlyKeyword} partial {declarationKeywords} {classDeclaration}
             {{
                 {documentation}
                 {accessibility} {classSymbol.Name}({parameterDeclarations})

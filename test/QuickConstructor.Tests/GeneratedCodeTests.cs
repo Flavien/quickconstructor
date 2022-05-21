@@ -530,25 +530,29 @@ public class GeneratedCodeTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
-    [Fact]
-    public async Task Rendering_Record()
+    [Theory]
+    [InlineData("struct")]
+    [InlineData("record")]
+    [InlineData("record class")]
+    [InlineData("record struct")]
+    public async Task Rendering_DeclarationTypes(string declarationKeyword)
     {
-        string sourceCode = @"
+        string sourceCode = $@"
             [QuickConstructor(Documentation = null)]
-            partial record TestClass
-            {
+            partial {declarationKeyword} TestClass
+            {{
                 private readonly int fieldOne;
-            }";
+            }}";
 
-        string generatedCode = @"
-            partial record TestClass
-            {
+        string generatedCode = $@"
+            partial {declarationKeyword} TestClass
+            {{
                 public TestClass(
                     int @fieldOne)
-                {
+                {{
                     this.@fieldOne = @fieldOne;
-                }
-            }";
+                }}
+            }}";
 
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
