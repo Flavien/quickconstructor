@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 internal static class QuickConstructorExtensions
 {
@@ -43,5 +44,23 @@ internal static class QuickConstructorExtensions
         }
 
         return attribute;
+    }
+
+    public static string GetDeclarationKeywords(this INamedTypeSymbol symbol)
+    {
+        StringBuilder stringBuilder = new();
+
+        if (symbol.IsRecord)
+        {
+            stringBuilder.Append(SyntaxFactory.Token(SyntaxKind.RecordKeyword).ToFullString());
+            stringBuilder.Append(' ');
+        }
+
+        if (symbol.TypeKind == TypeKind.Struct)
+            stringBuilder.Append(SyntaxFactory.Token(SyntaxKind.StructKeyword).ToFullString());
+        else
+            stringBuilder.Append(SyntaxFactory.Token(SyntaxKind.ClassKeyword).ToFullString());
+
+        return stringBuilder.ToString();
     }
 }

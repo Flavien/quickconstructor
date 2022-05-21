@@ -39,7 +39,7 @@ public class SourceRenderer
         string documentation = RenderDocumentation(constructorDescriptor);
         string accessibility = GetAccessModifier(constructorDescriptor.Accessibility);
         string readonlyKeyword = constructorDescriptor.IsReadOnly ? "readonly" : "";
-        string declarationKeywords = constructorDescriptor.DeclarationKeywords.ToFullString();
+        string declarationKeywords = classSymbol.GetDeclarationKeywords();
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", allParameters.Select(parameter => RenderParameter(parameter)));
         string baseClassConstructor = CreateBaseClassConstructor(baseClassParameters);
@@ -63,8 +63,10 @@ public class SourceRenderer
         while (currentSymbol.ContainingType != null)
         {
             currentSymbol = currentSymbol.ContainingType;
+            string symbolDeclaration = currentSymbol.GetDeclarationKeywords();
+            string symbolName = currentSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
             namespaceContents = $@"
-                partial class {currentSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}
+                partial {symbolDeclaration} {symbolName}
                 {{
                     {namespaceContents}
                 }}";

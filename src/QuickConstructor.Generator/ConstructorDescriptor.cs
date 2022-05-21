@@ -23,14 +23,12 @@ public record ConstructorDescriptor
     public ConstructorDescriptor(
         INamedTypeSymbol classSymbol,
         Accessibility accessibility,
-        SyntaxTokenList declarationKeywords,
         ImmutableArray<ConstructorParameter> constructorParameters,
         ImmutableArray<ConstructorParameter> baseClassConstructorParameters,
         string? documentation)
     {
         ClassSymbol = classSymbol;
         Accessibility = accessibility;
-        DeclarationKeywords = declarationKeywords;
         ConstructorParameters = constructorParameters;
         BaseClassConstructorParameters = baseClassConstructorParameters;
         Documentation = documentation;
@@ -39,8 +37,6 @@ public record ConstructorDescriptor
     public INamedTypeSymbol ClassSymbol { get; }
 
     public Accessibility Accessibility { get; }
-
-    public SyntaxTokenList DeclarationKeywords { get; }
 
     public bool IsReadOnly { get; }
 

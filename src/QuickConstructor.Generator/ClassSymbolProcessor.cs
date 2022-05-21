@@ -66,17 +66,9 @@ public class ClassSymbolProcessor
                 _classSymbol.Name));
         }
 
-        SyntaxTokenList declarationKeywords = new(_declarationSyntax.Keyword);
-        if (_declarationSyntax is RecordDeclarationSyntax recordDeclarationSyntax)
-        {
-            if (!recordDeclarationSyntax.ClassOrStructKeyword.IsKind(SyntaxKind.None))
-                declarationKeywords = declarationKeywords.Add(recordDeclarationSyntax.ClassOrStructKeyword);
-        }
-
         return new ConstructorDescriptor(
             classSymbol: _classSymbol,
             accessibility: _attribute.ConstructorAccessibility,
-            declarationKeywords: declarationKeywords,
             constructorParameters: members,
             baseClassConstructorParameters: baseClassMembers,
             documentation: _attribute.Documentation);

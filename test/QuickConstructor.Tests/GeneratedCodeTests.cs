@@ -498,54 +498,23 @@ public class GeneratedCodeTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
-    [Fact]
-    public async Task Rendering_NestedClass()
-    {
-        string sourceCode = @"
-            partial class Parent
-            {
-                [QuickConstructor]
-                partial class TestClass
-                {
-                    private readonly int fieldOne;
-                }
-            }";
-
-        string generatedCode = @"
-            partial class Parent
-            {
-                partial class TestClass
-                {
-                    /// <summary>
-                    /// Initializes a new instance of the <see cref=""TestClass"" /> class.
-                    /// </summary>
-                    public TestClass(
-                        int @fieldOne)
-                    {
-                        this.@fieldOne = @fieldOne;
-                    }
-                }
-            }";
-
-        await AssertGeneratedCode(sourceCode, generatedCode);
-    }
-
     [Theory]
-    [InlineData("struct")]
-    [InlineData("record")]
-    [InlineData("record class")]
-    [InlineData("record struct")]
-    public async Task Rendering_DeclarationTypes(string declarationKeyword)
+    [InlineData("class", "class")]
+    [InlineData("struct", "struct")]
+    [InlineData("record", "record class")]
+    [InlineData("record class", "record class")]
+    [InlineData("record struct", "record struct")]
+    public async Task Rendering_DeclarationTypes(string declarationKeywords, string expected)
     {
         string sourceCode = $@"
             [QuickConstructor(Documentation = null)]
-            partial {declarationKeyword} TestClass
+            partial {declarationKeywords} TestClass
             {{
                 private readonly int fieldOne;
             }}";
 
         string generatedCode = $@"
-            partial {declarationKeyword} TestClass
+            partial {expected} TestClass
             {{
                 public TestClass(
                     int @fieldOne)
@@ -557,25 +526,39 @@ public class GeneratedCodeTests
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
 
-    [Fact]
-    public async Task Rendering_Struct()
+    [Theory]
+    [InlineData("class", "class")]
+    [InlineData("struct", "struct")]
+    [InlineData("record", "record class")]
+    [InlineData("record class", "record class")]
+    [InlineData("record struct", "record struct")]
+    public async Task Rendering_NestedClass(string declarationKeywords, string expected)
     {
-        string sourceCode = @"
-            [QuickConstructor(Documentation = null)]
-            partial struct TestClass
-            {
-                private readonly int fieldOne;
-            }";
+        string sourceCode = $@"
+            partial {declarationKeywords} Parent
+            {{
+                [QuickConstructor]
+                partial class TestClass
+                {{
+                    private readonly int fieldOne;
+                }}
+            }}";
 
-        string generatedCode = @"
-            partial struct TestClass
-            {
-                public TestClass(
-                    int @fieldOne)
-                {
-                    this.@fieldOne = @fieldOne;
-                }
-            }";
+        string generatedCode = $@"
+            partial {expected} Parent
+            {{
+                partial class TestClass
+                {{
+                    /// <summary>
+                    /// Initializes a new instance of the <see cref=""TestClass"" /> class.
+                    /// </summary>
+                    public TestClass(
+                        int @fieldOne)
+                    {{
+                        this.@fieldOne = @fieldOne;
+                    }}
+                }}
+            }}";
 
         await AssertGeneratedCode(sourceCode, generatedCode);
     }
