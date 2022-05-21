@@ -31,12 +31,12 @@ public class ClassMembersAnalyzer
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private readonly INamedTypeSymbol _classSymbol;
-    private readonly ClassDeclarationSyntax _declarationSyntax;
+    private readonly TypeDeclarationSyntax _declarationSyntax;
     private readonly QuickConstructorAttribute _attribute;
 
     public ClassMembersAnalyzer(
         INamedTypeSymbol classSymbol,
-        ClassDeclarationSyntax declarationSyntax,
+        TypeDeclarationSyntax declarationSyntax,
         QuickConstructorAttribute attribute)
     {
         _classSymbol = classSymbol;

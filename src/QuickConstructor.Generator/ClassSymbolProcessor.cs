@@ -25,12 +25,12 @@ using QuickConstructor.Attributes;
 public class ClassSymbolProcessor
 {
     private readonly INamedTypeSymbol _classSymbol;
-    private readonly ClassDeclarationSyntax _declarationSyntax;
+    private readonly TypeDeclarationSyntax _declarationSyntax;
     private readonly QuickConstructorAttribute _attribute;
 
     public ClassSymbolProcessor(
         INamedTypeSymbol classSymbol,
-        ClassDeclarationSyntax declarationSyntax,
+        TypeDeclarationSyntax declarationSyntax,
         QuickConstructorAttribute attribute)
     {
         _classSymbol = classSymbol;
@@ -66,8 +66,9 @@ public class ClassSymbolProcessor
         }
 
         return new ConstructorDescriptor(
-            _classSymbol,
-            _attribute.ConstructorAccessibility,
+            classSymbol: _classSymbol,
+            accessibility: _attribute.ConstructorAccessibility,
+            declarationKeyword: _declarationSyntax.Keyword,
             constructorParameters: members,
             baseClassConstructorParameters: baseClassMembers,
             documentation: _attribute.Documentation);
@@ -75,7 +76,7 @@ public class ClassSymbolProcessor
 
     private static IEnumerable<ConstructorParameter> GetRecursiveClassMembers(
         INamedTypeSymbol? classSymbol,
-        ClassDeclarationSyntax declarationSyntax)
+        TypeDeclarationSyntax declarationSyntax)
     {
         if (classSymbol != null)
         {

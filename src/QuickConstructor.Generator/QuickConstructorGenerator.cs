@@ -62,7 +62,10 @@ public class QuickConstructorGenerator : IIncrementalGenerator
         if (syntaxNode is not AttributeSyntax attribute)
             return false;
 
-        if (attribute?.Parent?.Parent is not ClassDeclarationSyntax)
+        if (attribute?.Parent?.Parent is not TypeDeclarationSyntax typeDeclaration)
+            return false;
+
+        if (!IsValidDeclaration(typeDeclaration))
             return false;
 
         if (!_attributeSyntaxRegex.IsMatch(attribute.Name.ToString()))
@@ -78,10 +81,13 @@ public class QuickConstructorGenerator : IIncrementalGenerator
         if (syntaxContext.Node is not AttributeSyntax attributeSyntax)
             return null;
 
-        if (attributeSyntax?.Parent?.Parent is not ClassDeclarationSyntax classDeclarationSyntax)
+        if (attributeSyntax?.Parent?.Parent is not TypeDeclarationSyntax typeDeclaration)
             return null;
 
-        ISymbol? symbol = syntaxContext.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax, cancel);
+        if (!IsValidDeclaration(typeDeclaration))
+            return null;
+
+        ISymbol? symbol = syntaxContext.SemanticModel.GetDeclaredSymbol(typeDeclaration, cancel);
 
         if (symbol is not INamedTypeSymbol classSymbol)
             return null;
@@ -91,7 +97,7 @@ public class QuickConstructorGenerator : IIncrementalGenerator
         if (attribute == null)
             return null;
 
-        return new ClassSymbolProcessor(classSymbol, classDeclarationSyntax, attribute);
+        return new ClassSymbolProcessor(classSymbol, typeDeclaration, attribute);
     }
 
     private (ConstructorDescriptor?, Diagnostic?) ProcessSymbol(
@@ -109,6 +115,13 @@ public class QuickConstructorGenerator : IIncrementalGenerator
         {
             return (null, exception.Diagnostic);
         }
+    }
+
+    private static bool IsValidDeclaration(TypeDeclarationSyntax typeDeclaration)
+    {
+        return typeDeclaration is ClassDeclarationSyntax
+            || typeDeclaration is RecordDeclarationSyntax
+            || typeDeclaration is StructDeclarationSyntax;
     }
 
     private class ClassSymbolProcessorComparer : IEqualityComparer<ClassSymbolProcessor?>

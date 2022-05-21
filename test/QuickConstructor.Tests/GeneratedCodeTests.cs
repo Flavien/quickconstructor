@@ -531,6 +531,52 @@ public class GeneratedCodeTests
     }
 
     [Fact]
+    public async Task Rendering_Record()
+    {
+        string sourceCode = @"
+            [QuickConstructor(Documentation = null)]
+            partial record TestClass
+            {
+                private readonly int fieldOne;
+            }";
+
+        string generatedCode = @"
+            partial record TestClass
+            {
+                public TestClass(
+                    int @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
+    public async Task Rendering_Struct()
+    {
+        string sourceCode = @"
+            [QuickConstructor(Documentation = null)]
+            partial struct TestClass
+            {
+                private readonly int fieldOne;
+            }";
+
+        string generatedCode = @"
+            partial struct TestClass
+            {
+                public TestClass(
+                    int @fieldOne)
+                {
+                    this.@fieldOne = @fieldOne;
+                }
+            }";
+
+        await AssertGeneratedCode(sourceCode, generatedCode);
+    }
+
+    [Fact]
     public async Task Rendering_Documentation()
     {
         string sourceCode = @"

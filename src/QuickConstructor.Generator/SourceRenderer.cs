@@ -14,6 +14,7 @@
 
 namespace QuickConstructor.Generator;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,13 +38,15 @@ public class SourceRenderer
         string namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
         string documentation = RenderDocumentation(constructorDescriptor);
         string accessibility = GetAccessModifier(constructorDescriptor.Accessibility);
+        string declarationKeyword = constructorDescriptor.DeclarationKeyword.ToFullString();
         string classDeclaration = classSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         string parameterDeclarations = string.Join(",", allParameters.Select(parameter => RenderParameter(parameter)));
         string baseClassConstructor = CreateBaseClassConstructor(baseClassParameters);
         string nullChecks = string.Concat(parameters.Select(parameter => RenderNullCheck(parameter)));
         string assignments = string.Concat(parameters.Select(parameter => RenderAssignment(parameter)));
+        
         string namespaceContents = $@"
-            partial class {classDeclaration}
+            partial {declarationKeyword} {classDeclaration}
             {{
                 {documentation}
                 {accessibility} {classSymbol.Name}({parameterDeclarations})
@@ -106,13 +109,13 @@ public class SourceRenderer
         ";
     }
 
-    private string RenderAssignment(ConstructorParameter parameter)
+    private static string RenderAssignment(ConstructorParameter parameter)
     {
         return $@"
             this.@{parameter.Symbol.Name} = @{parameter.ParameterName};";
     }
 
-    private string CreateBaseClassConstructor(IReadOnlyList<ConstructorParameter> baseClassParameters)
+    private static string CreateBaseClassConstructor(IReadOnlyList<ConstructorParameter> baseClassParameters)
     {
         if (baseClassParameters.Count == 0)
             return string.Empty;
@@ -122,7 +125,7 @@ public class SourceRenderer
         return $": base({string.Join(", ", argumentList)})";
     }
 
-    private string RenderDocumentation(ConstructorDescriptor constructor)
+    private static string RenderDocumentation(ConstructorDescriptor constructor)
     {
         if (constructor.Documentation == null)
         {
@@ -143,7 +146,7 @@ public class SourceRenderer
         }
     }
 
-    private string GetAccessModifier(Attributes.Accessibility accessibility)
+    private static string GetAccessModifier(Attributes.Accessibility accessibility)
     {
         return accessibility switch
         {

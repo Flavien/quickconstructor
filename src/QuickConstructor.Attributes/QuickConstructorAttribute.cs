@@ -20,7 +20,7 @@ using System.Diagnostics;
 /// <summary>
 /// Specifies that a constructor should be automatically generated.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
 [Conditional("INCLUDE_AUTO_CONSTRUCTOR_ATTRIBUTES")]
 public sealed class QuickConstructorAttribute : Attribute
 {

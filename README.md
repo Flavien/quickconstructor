@@ -10,7 +10,8 @@ QuickConstructor is a reliable and feature-rich source generator that can automa
 - Customize which fields and properties are initialized in the constructor.
 - Generate null checks automatically based on nullable annotations.
 - Works with nested classes and generic classes.
-- Support derived classes.
+- Supports derived classes.
+- Supports classes, records and structs.
 - Ability to place attributes on the parameters of the generated constructor.
 - No traces left after compilation, no runtime reference necessary.
 - Generate XML documentation automatically for the constructor.
